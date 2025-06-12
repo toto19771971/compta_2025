@@ -662,7 +662,7 @@ def submit_ecriture():
 # On préprare le matériel pour l'utilitaire:
 from sqlalchemy import inspect
 import pandas as pd
-from utils import load_sheet1
+# from utils import load_sheet1
 from sqlalchemy import create_engine
 
 engine = create_engine('sqlite:///grand_livre.db')
