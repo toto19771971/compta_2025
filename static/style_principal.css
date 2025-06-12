@@ -1,0 +1,53 @@
+/* style_principal.css : mise en page commune, sans couleurs */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Effet d'ombre */
+}
+
+.logo {
+  width: 300px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  /* color retiré */
+}
+
+.button-container {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
+
+.custom-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px 60px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 20px;
+  /* background-color, border, color retirés */
+  transition: background-color 0.3s, border-color 0.3s;
+  width: 400px;
+}
+
+.custom-button:hover {
+  /* background-color, border-color retirés */
+  transition: background-color 0.3s, border-color 0.3s;
+}

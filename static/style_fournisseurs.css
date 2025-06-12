@@ -1,0 +1,20 @@
+/* style_fournisseurs.css : Surcharges pour le module fournisseurs (couleurs, relief et survol) */
+body {
+    background: linear-gradient(45deg, #a8e063, #56ab2f) !important; /* Fond de page en dégradé vert doux */
+  }
+  
+  .custom-button {
+    background: linear-gradient(45deg, #a5d6a7, #81c784) !important; /* Bouton en dégradé vert */
+    border: 3px solid #388e3c !important; /* Bordure verte visible */
+    color: #fff !important; /* Texte blanc */
+    border-radius: 10px !important;  /* Même arrondi que dans le style principal */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important; /* Relief léger */
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s !important; /* Transition pour survol */
+  }
+  
+  .custom-button:hover {
+    background: linear-gradient(45deg, #81c784, #6eb774) !important; /* Fond modifié au survol */
+    border-color: #2e7d32 !important; /* Bordure plus foncée au survol */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15) !important; /* Relief accru lors du survol */
+  }
+  

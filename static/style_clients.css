@@ -1,0 +1,15 @@
+/* Remplacez le contenu de style_clients.css par celui-ci */
+body {
+    background: linear-gradient(45deg, #ffcccc, #ff6666) !important;
+  }
+  .custom-button {
+    background: linear-gradient(45deg, #ff9999, #ff4d4d) !important;
+    border: 3px solid #8B0000 !important;
+    color: #fff !important;
+    border-radius: 10px !important;
+  }
+  .custom-button:hover {
+    background: linear-gradient(45deg, #ff4d4d, #ff1a1a) !important;
+    border-color: #8B0000 !important;
+  }
+  

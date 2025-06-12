@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Principal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            width: 300px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .button-container {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: 1fr;
+        }
+
+        .custom-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 25px 60px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 20px;
+            border: 3px solid #007bff;
+            transition: background-color 0.3s, border-color 0.3s;
+            width: 400px;
+        }
+
+        .custom-button:hover {
+            background-color: #e0e0e0;
+            border-color: #0056b3;
+        }
+</style>
+</head>
+<body>
+    <div class="container">
+        <img src="../static/icons/logo.png" alt="Logo" class="logo">
+        <h1>Menu Principal</h1>
+        <div class="button-container">
+            <a href="{{ url_for('menu_comptabilite') }}" class="custom-button"> 
+                Menu Comptabilité
+            </a>
+            <a href="{{ url_for('salaires_rh_menu') }}" class="custom-button">
+                Salaires RH
+            </a>
+            
+            <a href="#" class="custom-button">
+                Gestion des Alertes
+            </a>
+            <a href="#" class="custom-button">
+                Administration
+            </a>
+        </div>
+    </div>
+</body>
+</html>

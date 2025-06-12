@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comptabilité fournisseurs</title>
+    <link rel="stylesheet" <!-- Dans votre template, incluez d'abord style_principal.css, puis style_fournisseurs.css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_principal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_fournisseurs.css') }}">
+    <style>
+    .container { background-color: #f0fff0 !important; }
+    </style>    
+    
+</head>
+<body>
+    <div class="container">
+        <h1>Comptabilité fournisseurs</h1>
+        <div class="button-container">
+                <a href="{{ url_for('recherche_factures_fournisseurs') }}" class="custom-button">
+                    Factures fournisseurs et notes de crédit
+                </a>
+                <a href="{{ url_for('recherche_fournisseurs')}}" class="custom-button">
+                    Liste des fournisseurs
+                </a>
+                <a href="#" class="custom-button">
+                    Paiements en attente
+                </a>
+                <a href="#" class="custom-button">
+                     Factures fournisseurs mémorisées
+                </a>
+        </div>
+    </div>
+</body>
+</html>

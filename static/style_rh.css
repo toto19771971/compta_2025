@@ -1,0 +1,25 @@
+/* Fond JAUNE dégradé */
+body {
+    background: linear-gradient(45deg, #fffacd, #ffd700) !important;
+}
+
+/* Styles pour transformer les liens en boutons */
+.custom-button {
+    background: linear-gradient(45deg, #ffecb3, #ffca28) !important;
+    border: 3px solid #b8860b !important;
+    color: #fff !important;
+    border-radius: 10px !important;
+    padding: 15px 30px;
+    display: inline-block;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.custom-button:hover {
+    background: linear-gradient(45deg, #ffca28, #ffb300) !important;
+    border-color: #8b6508 !important;
+}
