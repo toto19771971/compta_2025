@@ -2,231 +2,252 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Recherche de Factures</title>
+  <title>Wireframe - Nouvelle Facture Client</title>
   <style>
-    /* Container : 75% de la largeur, centré */
-    .container {
-      width: 75%;
-      margin: 0 auto;
-      padding: 15px;
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: linear-gradient(45deg, #ffcccc, #ff6666) !important;
     }
-
-    /* Titre centré */
-    h2 {
-      text-align: center;
-      margin-bottom: 1.5rem; /* équivaut à mb-4 */
-    }
-
-    /* Marges utilitaires */
-    .mb-4 { margin-bottom: 1.5rem !important; }
-    .mt-3 { margin-top: 1rem !important; }
-    .mt-4 { margin-top: 1.5rem !important; }
-    .mt-5 { margin-top: 3rem !important; }
-
-    /* Grille simplifiée pour une mise en page symétrique */
-    .row {
+    .header {
       display: flex;
-      flex-wrap: wrap;
-      margin-left: -0.5rem;
-      margin-right: -0.5rem;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
     }
-    .row > [class^="col-md-"] {
-      padding-left: 0.5rem;
-      padding-right: 0.5rem;
-    }
-    .col-md-6 { flex: 0 0 auto; width: 50%; }
-    .g-3 > * { margin-bottom: 1rem; }
-
-    /* Champs de formulaire */
-    label {
-      display: block;
-      margin-bottom: 0.3rem;
-      font-weight: 500;
-    }
-    .form-control,
-    .form-select {
-      display: block;
-      width: 100%;
-      padding: 0.375rem 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-
-    /* Boutons : aucune couleur ici (laissée au style_fournisseurs.css) */
-    .btn {
-      display: inline-block;
-      padding: 0.375rem 0.75rem;
+    .header button {
+      background-color: #08519a;
+      color: #ffffff;
       border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+    .header button:hover {
+      background-color: #0056b3;
+    }
+    .form-container {
+      display: flex;
+      justify-content: flex-start;
+      align-items: start;
+      gap: 40px;
+    }
+    form {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      row-gap: 10px;
+      column-gap: 10px;
+      max-width: 500px;
+    }
+    .right-group {
+      display: grid;
+      grid-template-columns: 150px 250px;
+      row-gap: 10px;
+      column-gap: 10px;
+      width: 400px;
+    }
+    form input, form select, form textarea {
+      width: 100%;
+      padding: 4px;
+      box-sizing: border-box;
+    }
+    .right-group input, .right-group select, .right-group textarea {
+      width: 250px;
+      padding: 4px;
+      box-sizing: border-box;
+    }
+    .right-group textarea {
+      height: 100px;
+      resize: vertical;
+    }
+    label {
+      align-self: center;
+      margin-right: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+    th, td {
+      border: 1px solid #888;
+      padding: 6px;
+      text-align: left;
+    }
+    th {
+      background: #ddd;
+    }
+    td input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 4px;
+    }
+    .add-btn {
+      background: #0056b3;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 1rem;
-      line-height: 1.5;
+      font-size: 14px;
+      margin: 8px 0;
+      display: inline-block;
     }
-    .btn-primary {}
-    .btn-secondary {}
-    .btn-search {
-      border: none;
+    .spacer {
+      height: 20px;
+      background: #fff;
+      margin: 0;
     }
-
-    /* Alignements et espacements */
-    .d-flex { display: flex; }
-    .gap-2 { gap: 0.5rem; }
-    .align-items-center { align-items: center; }
-
-    /* Séparateur "à" entre les dates */
-    .date-separator {
-      margin: 0 0.5rem;
+    .total-ttc {
+      margin-top: 20px;
       font-weight: bold;
+      color: red;
+      text-align: right;
+      font-size: 20px;
     }
-
-    /* Résultats et actions */
-    .results {}
-    .form-actions {}
+    .total-ttc input {
+      width: 120px;
+      height: 40px;
+      margin-left: 10px;
+      font-size: 20px;
+    }
   </style>
-  <!-- Charge ensuite le style_fournisseurs.css pour la couleur (fond vert, boutons, etc.) -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='style_fournisseurs.css') }}">
 </head>
 <body>
-  <div class="container">
-    <h2>Recherche de Factures</h2>
-    
-    <form id="formRecherche">
-      <!-- Ligne 1 : 3 champs à gauche, 3 champs à droite (répartis en 2 colonnes) -->
-      <div class="row g-3 mb-4">
-        <div class="col-md-6">
-          <!-- Partie gauche -->
-          <div class="form-group mb-4">
-            <label>N° de facture</label>
-            <input type="text" class="form-control" name="N° de facture">
-          </div>
 
-          <div class="form-group mb-4">
-            <label>Fournisseur</label>
-            <div class="d-flex gap-2">
-              <input type="text" class="form-control" name="Fournisseur">
-              <button type="button" class="btn btn-search" onclick="rechercher()">
-                Rech.
-              </button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>N° de PO</label>
-            <input type="text" class="form-control" name="N° de PO">
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <!-- Partie droite -->
-          <div class="form-group mb-4">
-            <label>Payé</label>
-            <select class="form-select" name="Payé">
-              <option value="">Tous</option>
-              <option>Comptabilité</option>
-              <option>Trésorerie</option>
-              <option>Service client</option>
-              <option>Autre</option>
-            </select>
-          </div>
-
-          <div class="form-group mb-4">
-            <label>N° de compte fournisseurs</label>
-            <div class="d-flex gap-2">
-              <input type="text" class="form-control" name="N° de compte fournisseurs">
-              <button type="button" class="btn btn-search" onclick="rechercher()">
-                Rech.
-              </button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Annuler</label>
-            <select class="form-select" name="Annuler">
-              <option value="">Tous</option>
-              <option>Erreur de saisie</option>
-              <option>Annulation client</option>
-              <option>Problème fournisseur</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ligne 2 : Dates de facture et d'échéance -->
-      <div class="row g-3 mb-4">
-        <div class="col-md-6">
-          <label>Date de facture</label>
-          <div class="d-flex gap-2 align-items-center">
-            <input type="date" class="form-control" name="Date de facture De">
-            <span class="date-separator">à</span>
-            <input type="date" class="form-control" name="Date de facture Vers">
-          </div>
-        </div>
-        
-        <div class="col-md-6">
-          <label>Date d'échéance</label>
-          <div class="d-flex gap-2 align-items-center">
-            <input type="date" class="form-control" name="Date d'échéance De">
-            <span class="date-separator">à</span>
-            <input type="date" class="form-control" name="Date d'échéance Vers">
-          </div>
-        </div>
-      </div>
-
-      <!-- Résultats -->
-      <div class="results mt-5">
-        <h4>Résultats</h4>
-        <div id="resultats" class="mt-3"></div>
-      </div>
-
-      <!-- Boutons Rechercher / Réinitialiser -->
-      <div class="form-actions mt-4">
-        <button type="button" class="btn btn-primary" onclick="rechercher()">
-          Rechercher
-        </button>
-        <button type="reset" class="btn btn-secondary">
-          Réinitialiser
-        </button>
-      </div>
-    </form>
+  <div class="header">
+    <button onclick="window.location.href='/comptabilite_clients'">Retour</button>
+    <button onclick="window.open('https://fr.wikipedia.org', '_blank')">Aide</button>
+    <button onclick="window.print()">Imprimer</button>
+    <button disabled>Ajouter</button>
+    <button disabled>Mettre à jour</button>
   </div>
 
-  <script>
-    async function rechercher() {
-      const formData = {
-        numero_facture: document.querySelector('[name="N° de facture"]').value,
-        fournisseur: document.querySelector('[name="Fournisseur"]').value,
-        compte_fournisseur: document.querySelector('[name="N° de compte fournisseurs"]').value
-      };
+  <h1>Nouvelle Facture Client</h1>
 
-      try {
-        const response = await fetch('/rechercher', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
-        
-        const data = await response.json();
-        
-        if(data.length > 0) {
-          // Auto-remplir le formulaire avec le premier résultat
-          const premierResultat = data[0];
-          for(const [key, value] of Object.entries(premierResultat)) {
-            const element = document.querySelector(`[name="${key}"]`);
-            if(element) element.value = value;
-          }
-          
-          // Afficher tous les résultats
-          document.getElementById('resultats').innerHTML = `
-            <pre>${JSON.stringify(data, null, 2)}</pre>
-          `;
-        } else {
-          alert('Aucun résultat trouvé');
-        }
-      } catch (error) {
-        console.error('Erreur:', error);
-      }
-    }
+  <div class="form-container">
+    <form>
+      <label for="client">Client :</label>
+      <input id="client" type="text" placeholder="">
+      <label for="num_compte_client">No compte Client :</label>
+      <input id="num_compte_client" type="text" placeholder="">
+      <label for="condition_paiement">Condition de paiement :</label>
+      <input id="condition_paiement" type="text" placeholder="">
+      <label for="date_facture">Date de facture :</label>
+      <input id="date_facture" type="date">
+      <label for="date_echeance">Date échéance :</label>
+      <input id="date_echeance" type="date">
+      <label for="date_paiement">Date paiement prévue :</label>
+      <input id="date_paiement" type="date">
+      <label for="periode">Période :</label>
+      <input id="periode" type="text" placeholder="">
+      <label for="montant">Montant :</label>
+      <input id="montant" type="text" placeholder="">
+      <label for="balance">Balance :</label>
+      <input id="balance" type="text" placeholder="">
+    </form>
+    <div class="right-group">
+      <label for="num_facture">No de facture :</label>
+      <input id="num_facture" type="text" placeholder="">
+      <label for="num_commande">No de commande :</label>
+      <input id="num_commande" type="text" placeholder="">
+      <label for="statut">Statut :</label>
+      <input id="statut" type="text" placeholder="">
+    </div>
+  </div>
+
+  <!-- Tableau Lignes Facture -->
+  <table id="invoice-table">
+    <thead>
+      <tr>
+        <th>No de compte</th>
+        <th>Intitulé du compte</th>
+        <th>Quantité</th>
+        <th>Unité</th>
+        <th>Montant</th>
+        <th>Taux TVA</th>
+      </tr>
+    </thead>
+    <tbody id="invoice-body">
+      <tr>
+        <td><input name="compte[]" /></td>
+        <td><input name="intitule[]" /></td>
+        <td><input name="quantite[]" type="number" /></td>
+        <td><input name="unite[]" /></td>
+        <td><input name="montant[]" /></td>
+        <td><input name="tva[]" /></td>
+      </tr>
+    </tbody>
+  </table>
+  <button id="add-invoice" class="add-btn">+ Ajouter une ligne</button>
+
+  <!-- Spacer blanc -->
+  <div class="spacer"></div>
+
+  <!-- Tableau Lignes TVA -->
+  <table id="tax-table">
+    <thead>
+      <tr>
+        <th>No de compte TVA</th>
+        <th>Libellé Taxe</th>
+        <th>Taux de taxe</th>
+        <th>Montant des taxes</th>
+        <th>Taxe</th>
+      </tr>
+    </thead>
+    <tbody id="tax-body">
+      <tr>
+        <td><input name="compte_tva[]" /></td>
+        <td><input name="libelle_taxe[]" /></td>
+        <td><input name="taux_taxe[]" /></td>
+        <td><input name="montant_taxe[]" /></td>
+        <td><input name="taxe[]" /></td>
+      </tr>
+    </tbody>
+  </table>
+  <button id="add-tax" class="add-btn">+ Ajouter une ligne</button>
+
+  <!-- Total TTC -->
+  <div class="total-ttc">
+    Total TTC : <input type="text" name="total_ttc" />
+  </div>
+
+  <template id="tpl-invoice-line">
+    <tr>
+      <td><input name="compte[]" /></td>
+      <td><input name="intitule[]" /></td>
+      <td><input name="quantite[]" type="number" /></td>
+      <td><input name="unite[]" /></td>
+      <td><input name="montant[]" /></td>
+      <td><input name="tva[]" /></td>
+    </tr>
+  </template>
+
+  <template id="tpl-tax-line">
+    <tr>
+      <td><input name="compte_tva[]" /></td>
+      <td><input name="libelle_taxe[]" /></td>
+      <td><input name="taux_taxe[]" /></td>
+      <td><input name="montant_taxe[]" /></td>
+      <td><input name="taxe[]" /></td>
+    </tr>
+  </template>
+
+  <script>
+    const invBody = document.getElementById('invoice-body');
+    const taxBody = document.getElementById('tax-body');
+    const tplInv  = document.getElementById('tpl-invoice-line').content;
+    const tplTax  = document.getElementById('tpl-tax-line').content;
+
+    document.getElementById('add-invoice').onclick = () => {
+      invBody.appendChild(document.importNode(tplInv, true));
+    };
+    document.getElementById('add-tax').onclick = () => {
+      taxBody.appendChild(document.importNode(tplTax, true));
+    };
   </script>
+
 </body>
 </html>
