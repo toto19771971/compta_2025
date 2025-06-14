@@ -76,12 +76,19 @@ def get_accounts():
 
 
 
+#@app.route
+# def index():
+   # return render_template('index.html')
+
+
 @app.route('/')
-def index():
-    return render_template('index.html')
+def page_en_construction():
+    return render_template('en_construction.html')
 
-
-
+# Optionnel : pour bloquer toutes les autres routes
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('construction.html'), 200
 
 
 
@@ -262,6 +269,35 @@ def supprimer_fournisseur():
         return jsonify({"message": "Fournisseur supprimé avec succès !"}), 200
     except Exception as e:
         return jsonify({"message": f"Erreur lors de la suppression du fournisseur: {str(e)}"}), 500
+    
+
+@app.route('/liste_fournisseurs')
+def liste_fournisseurs():
+    import os, pandas as pd
+    file_path = os.path.join(app.root_path, 'bd_fournisseurs.xlsx')
+    df = pd.read_excel(file_path)
+
+    # on ajoute : table-hover, table-striped, table-bordered
+    table_html = df.to_html(
+        classes="table table-striped table-hover table-bordered",
+        index=False,
+        justify="center"
+    )
+
+    return render_template(
+        'templates_fournisseurs/liste_fournisseurs.html',
+        table_html=table_html
+    )
+
+
+
+
+
+
+
+
+
+
     
 
 @app.route('/comptabilite_clients')
