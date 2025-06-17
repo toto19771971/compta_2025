@@ -75,15 +75,18 @@ def get_accounts():
     return df.to_dict(orient='records')
 
 
+#@app.route('/')
+# def page_en_construction():
+    return render_template('en_construction.html')
 
-#@app.route
-# def index():
-   # return render_template('index.html')
 
 
 @app.route('/')
-def page_en_construction():
-    return render_template('en_construction.html')
+def index():
+   return render_template('index.html')
+
+
+
 
 # Optionnel : pour bloquer toutes les autres routes
 @app.errorhandler(404)
