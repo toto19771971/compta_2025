@@ -5,7 +5,48 @@
     <meta charset="UTF-8">
     <title>Recherche États Financiers</title>
 </head>
+<style>
+    body {background-color: #f4f4f4
+    }
+
+    .header {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            }
+    .header button {
+            background-color: #08519a;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            
+            }
+    .header button:hover {
+            background-color: #0056b3;
+            }
+
+
+
+
+</style>
+
+
 <body>
+    <br><br><br>
+    <div class="header">
+        <div class="header">
+            <button onclick="window.location.href='/grand_livre_accueil'">Retour</button>
+            <button onclick="window.open('https://fr.wikipedia.org', '_blank')">Aide</button>
+            <button onclick="window.print()">Imprimer</button>
+            <button disabled>Ajouter</button>
+            <button disabled>Mettre à jour</button>
+        </div>
+    </div>
+    <br><br><br>
     <h1>Recherche Bilan ou PP</h1>
     <form action="{{ url_for('pp_bilan_result') }}" method="POST">
         <label>Période de :</label>

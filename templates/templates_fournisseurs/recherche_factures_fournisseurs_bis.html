@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Wireframe - Nouvelle Facture Fournisseur</title>
+    <style>
+        /* Corps de page */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: rgb(131, 179, 118);
+        }
+
+        /* Header boutons centrés */
+        .header {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .header button {
+            background-color: #08519a;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            
+        }
+        .header button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Container des deux formulaires côte à côte,
+            et align-items: start empêche l’étirement vertical */
+        .form-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: start;
+            gap: 40px;
+        }
+
+        /* Formulaire de gauche : grille 2 colonnes (label + champ) */
+        form {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            row-gap: 10px;
+            column-gap: 10px;
+            max-width: 500px;
+        }
+
+        /* Groupe de droite (N° facture, commande, statut) :
+            grille 2 colonnes fixes (label + champ) */
+        .right-group {
+            display: grid;
+            grid-template-columns: 150px 250px;
+            row-gap: 10px;
+            column-gap: 10px;
+            /* largeur totale = 150 + 250 = 400px */
+            width: 400px;
+        }
+
+        /* Tous les inputs, selects, textareas du formulaire de gauche
+            (en remplissage de leur colonne) */
+        form input,
+        form select,
+        form textarea {
+            width: 100%;
+            padding: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Spécifique au bloc de droite : champ fixe 250px */
+        .right-group input,
+        .right-group select,
+        .right-group textarea {
+            width: 250px;
+            padding: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Hauteur des zones texte de droite */
+        .right-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        /* Labels alignés */
+        label {
+            align-self: center;
+            margin-right: 5px;
+        }
+
+        /* Tables en bas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        table, th, td {
+            border: 1px solid #888;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        tfoot td {
+            font-weight: bold;
+        }
+
+
+
+               
+        /* Boutons d’ajout, alignés à gauche */
+        .add-btn {
+            background: #0056b3;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 8px 0;
+            display: inline-block;
+        }
+        /* Ligne blanche entre les tables */
+        .spacer {
+            height: 20px;
+            background: #fff;
+            margin: 0;
+        }
+        /* Total TTC en rouge et gras, sous tout le reste */
+        .total-ttc {
+            margin-top: 20px;
+            font-weight: bold;
+            color: red;
+        }
+        .total-ttc input {
+            width: 120px;
+            margin-left: 10px;
+        }
+        /* Tableaux de saisie */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #888;
+            padding: 6px;
+        }
+        th {
+            background: #ddd;
+        }
+        td input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 4px;
+        }
+        .total-ttc, .total-ttc input { font-size:20px; height:40px; }
+
+    </style>
+
+</head>
+<body>
+  <div class="header">
+   <div class="header">
+    <button onclick="window.location.href='/comptabilite_fournisseurs'">Retour</button>
+    <button onclick="window.open('https://fr.wikipedia.org', '_blank')">Aide</button>
+    <button onclick="window.print()">Imprimer</button>
+    <button type="button" onclick="creerFacture()">Créer facture</button>
+    <button disabled>Mettre à jour</button>
+    <button type="button"onclick="window.location.href='{{ url_for('liste_factures_fournisseurs') }}'">
+          Liste factures
+    </button>
+
+   </div>
+  </div>
+
+  <h1>Nouvelle Facture Fournisseur</h1>
+
+  <form id="facture-form" method="post" action="{{ url_for('ajouter_facture') }}"></form>  
+      <div class="form-container">
+      <!-- Groupe de gauche -->
+    
+        <form>
+        
+          <label for="fournisseur">Fournisseur :</label>
+          <input id="fournisseur" type="text" placeholder="" list="liste_noms" autocomplete="off">
+          <datalist id="liste_noms">
+            {% for f in df_fournisseurs %}
+              <option value="{{ f['Nom du fournisseur'] }}"></option>
+            {% endfor %}
+          </datalist>
+
+
+
+
+
+
+
+          <label for="num_compte_fournisseur">No compte Fournisseur :</label>
+          <input id="num_compte_fournisseur" type="text" placeholder="">
+
+          <label for="condition_paiement">Condition de paiement :</label>
+          <input id="condition_paiement" type="text" placeholder="">
+
+          <label for="date_facture">Date de facture :</label>
+          <input id="date_facture" type="date">
+
+          <label for="date_echeance">Date échéance :</label>
+          <input id="date_echeance" type="date">
+
+          <label for="date_paiement">Date paiement prévue :</label>
+          <input id="date_paiement" type="date">
+
+          <label for="periode">Période :</label>
+          <input id="periode" type="text" placeholder="">
+
+          <label for="montant">Montant :</label>
+          <input id="montant" type="text" placeholder="">
+
+          <label for="balance">Balance :</label>
+          <input id="balance" type="text" placeholder="">
+
+
+
+        </form>
+
+      <!-- Groupe de droite (aligné sous le groupe de gauche) -->
+      <div class="right-group-container"></div>
+          <div class="right-group">
+              <label for="num_facture">No de facture :</label>
+              <input id="num_facture" type="text" placeholder="">
+
+              <label for="num_commande">No de commande :</label>
+              <input id="num_commande" type="text" placeholder="">
+
+              <label for="statut">Statut :</label>
+              <input id="statut" type="text" placeholder="">
+          </div>
+      </div>
+    </div>
+    <!-- Tableau des lignes de facture -->
+    
+
+    <!-- Table unique avec 2 niveaux d’en-têtes -->
+  <!-- ==== 1) Tableau Lignes Facture ==== -->
+  <table id="invoice-table">
+    <thead>
+      <tr>
+        <th>No de compte</th>
+        <th>Intitulé du compte</th>
+        <th>Quantité</th>
+        <th>Unité</th>
+        <th>Montant</th>
+        <th>Taux TVA</th>
+      </tr>
+    </thead>
+    <tbody id="invoice-body">
+      <tr>
+        <td><input name="compte[]" /></td>
+        <td><input name="intitule[]" /></td>
+        <td><input name="quantite[]" type="number" /></td>
+        <td><input name="unite[]" /></td>
+        <td><input name="montant[]" /></td>
+        <td><input name="tva[]" /></td>
+      </tr>
+    </tbody>
+
+  </table>
+  <button id="add-line-invoice" style="background:#0056b3;color:#fff;">+ Ajouter une ligne</button>
+
+  <!-- ==== 2) Tableau Lignes TVA ==== -->
+  <table id="tax-table" style="margin-top:20px;">
+    <thead>
+      <tr>
+        <th>No de compte TVA</th>
+        <th>Libellé Taxe</th>
+        <th>Taux de taxe</th>
+        <th>Montant des taxes</th>
+        <th>Taxe</th>
+      </tr>
+    </thead>
+    <tbody id="tax-body">
+      <tr>
+        <td><input name="compte_tva[]" /></td>
+        <td><input name="libelle_taxe[]" /></td>
+        <td><input name="taux_taxe[]" type="number" /></td>
+        <td><input name="montant_taxe[]" /></td>
+        <td><input name="taxe[]" /></td>
+      </tr>
+    </tbody>
+
+  </table>
+  <button id="add-tax" style="background:#0056b3;color:#fff;margin-top:8px;">+ Ajouter une ligne</button>
+
+  <!-- ==== 3) Total TTC ==== -->
+  <div style="text-align:right;margin-top:20px;font-weight:bold;color:red;">
+    Total TTC : <input type="text" name="total_ttc" />
+  </div>
+</form>
+<!-- ==== Templates Cachés ==== -->
+<template id="tpl-invoice-line">
+  <tr>
+    <td><input name="compte[]" /></td>
+    <td><input name="intitule[]" /></td>
+    <td><input name="quantite[]" type="number" /></td>
+    <td><input name="unite[]" /></td>
+    <td><input name="montant[]" /></td>
+    <td><input name="tva[]" /></td>
+  </tr>
+</template>
+
+<template id="tpl-tax-line">
+  <tr>
+    <td><input name="compte_tva[]" /></td>
+    <td><input name="libelle_taxe[]" /></td>
+    <td><input name="taux_taxe[]" /></td>
+    <td><input name="montant_taxe[]" /></td>
+    <td><input name="taxe[]" /></td>
+  </tr>
+</template>
+
+<!-- ==== JavaScript Miniimal ==== -->
+<script>
+  const invBody = document.getElementById('invoice-body');
+  const taxBody = document.getElementById('tax-body');
+  const tplInv  = document.getElementById('tpl-invoice-line').content;
+  const tplTax  = document.getElementById('tpl-tax-line').content;
+
+  document.getElementById('add-line-invoice').onclick = () => {
+    invBody.appendChild(document.importNode(tplInv, true));
+  };
+  document.getElementById('add-tax').onclick = () => {
+    taxBody.appendChild(document.importNode(tplTax, true));
+  };
+
+
+
+
+
+document.getElementById('fournisseur').addEventListener('change', function() {
+    const v = this.value.trim();
+    if (!v) return;
+    fetch('/autocomplete_factures_fournisseurs?query=' + encodeURIComponent(v))
+      .then(r => r.json())
+      .then(arr => {
+        const f = arr.find(x =>
+          x['Nom du fournisseur']
+            .toLowerCase()
+            .startsWith(v.toLowerCase())
+        ) || arr[0];
+
+        if (!f) return;
+        // 1) No de compte Fournisseur
+        document.getElementById('num_compte_fournisseur').value = f['Compte à créditer'];
+        // 2) Condition de paiement
+        document.getElementById('condition_paiement').value    = f['Délai de paiement'];
+        // 3) Ligne factures – No de compte (tableau)
+        document.querySelector('#invoice-body input[name="compte[]"]').value      = f['Compte à débiter'];
+        // 4) Taux TVA (tableau)
+        document.querySelector('#invoice-body input[name="tva[]"]').value        = f['Taux TVA 1'];
+
+        // 5) No de compte TVA (tableau TVA)
+        document.querySelector('#tax-body input[name="compte_tva[]"]').value     = f['Compte TVA'];
+      });
+  });
+
+
+
+ function creerFacture(){
+    fetch('/ajouter_facture', {
+      method:'POST',
+      body: new FormData(document.getElementById('facture-form'))
+    })
+    .then(r=>r.json())
+    .then(j=>alert(j.message));
+ }
+
+</script>
+
+
+
+
+</body>
+</html>
