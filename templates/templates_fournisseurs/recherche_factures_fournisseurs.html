@@ -64,7 +64,8 @@
     <button id="btn-create" type="button">Créer</button>
     <button id="btn-update" type="button">MAJ</button>
     <button onclick="location.href='/liste_factures_fournisseurs'">Liste</button>
-    <button onclick="viderFormulaire()" type="button">Vider</button>
+    <button id="btn-clear" type="button">Vider</button>
+
   </div>
 
   <!-- Le form unique -->
@@ -266,10 +267,10 @@
         const taxRow = document.querySelector('#tax-body tr:last-child');
         taxRow.querySelector('[name="compte_tva[]"]').value   = f['Compte TVA'];
       });
-  </script>
+
 
   <!-- === Votre JS de création / MAJ / vider === -->
-  <script>
+ 
     // … laissez ici exactement vos handlers «Créer», «MAJ», «Vider»…
 
 
@@ -335,6 +336,35 @@
     invBody.appendChild(document.importNode(tplInv, true));
     taxBody.appendChild(document.importNode(tplTax, true));
   });
+
+
+
+
+
+ // 1) on déclare la fonction au niveau global
+  function viderFormulaire() {
+    const form    = document.getElementById('invoiceForm');
+    const invBody = document.getElementById('invoice-body');
+    const taxBody = document.getElementById('tax-body');
+    const tplInv  = document.getElementById('tpl-invoice-line').content;
+    const tplTax  = document.getElementById('tpl-tax-line').content;
+
+    form.reset();
+    invBody.innerHTML = '';
+    taxBody.innerHTML = '';
+    invBody.appendChild(document.importNode(tplInv, true));
+    taxBody.appendChild(document.importNode(tplTax, true));
+  }
+
+  // 2) on rattache le clic au bouton
+  document.addEventListener('DOMContentLoaded', () => {
+    const btnClear = document.getElementById('btn-clear');
+    if (btnClear) btnClear.addEventListener('click', viderFormulaire);
+  });
+
+
+
+
 
 
   </script>
