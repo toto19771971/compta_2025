@@ -68,36 +68,104 @@
         .button:hover {
             background-color: #0056b3;
         }
+
+        /* ——— Styles de l’écran de connexion ——— */
+        #login-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        #main-page {
+            display: none;
+        }
+        #error-msg {
+            color: red;
+            visibility: hidden;
+            margin-top: 0.5em;
+        }
+        #password-input {
+            padding: 0.5em;
+            margin-bottom: 0.5em;
+            font-size: 1em;
+        }
+        #login-form button {
+            padding: 0.5em 1em;
+            font-size: 1em;
+        }
     </style>
 </head>
 <body>
-    <div id="language-switcher" style="float:right;padding:1em;"><a href="/en/"><img src="/static/flags/gb.svg" alt="English" width="24"></a>&nbsp;<a href="/chde/"><img src="/static/flags/ch.svg" alt="Schweizerdeutsch" width="24"></a></div>
 
-    <div class="header">
-        Problem Solving et Développement pour les Entreprises
+    <!-- Écran de connexion -->
+    <div id="login-page">
+      <h1>Accès restreint</h1>
+      <form id="login-form">
+        <input type="password" id="password-input" placeholder="Mot de passe" required />
+        <button type="submit">Valider</button>
+      </form>
+      <p id="error-msg">Mot de passe incorrect.</p>
     </div>
 
-    <div class="container">
-        <h1>Notre Approche</h1>
-        <p>Nous transformons vos défis en solutions innovantes grâce à la programmation et au développement sur mesure.</p>
+    <!-- Contenu original, masqué tant que non authentifié -->
+    <div id="main-page">
 
-        <ul>
-            <li><strong>✔ Analyse des besoins :</strong> Comprendre vos défis pour proposer des solutions adaptées.</li>
-            <li><strong>✔ Développement sur mesure :</strong> Création d'applications et d'outils personnalisés.</li>
-            <li><strong>✔ Optimisation continue :</strong> Amélioration des processus pour maximiser votre efficacité.</li>
-        </ul>
+      <div id="language-switcher" style="float:right;padding:1em;">
+        <a href="/en/"><img src="/static/flags/gb.svg" alt="English" width="24"></a>
+        &nbsp;
+        <a href="/chde/"><img src="/static/flags/ch.svg" alt="Schweizerdeutsch" width="24"></a>
+      </div>
 
-        <h1>Nos Solutions</h1>
-        <ul>
-            <li><strong>✔ Automatisation des tâches :</strong> Gagnez du temps en automatisant les processus répétitifs.</li>
-            <li><strong>✔ Gestion des données :</strong> Des outils puissants pour analyser et visualiser vos données.</li>
-            <li><strong>✔ Développement web et mobile :</strong> Des applications modernes et performantes.</li>
-        </ul>
+      <div class="header">
+          Problem Solving et Développement pour les Entreprises
+      </div>
 
-        <div class="button-container">
-            <a href="{{ url_for('menu_principal') }}" class="button">Entrer</a>
-        </div>
-    </div>
+      <div class="container">
+          <h1>Notre Approche</h1>
+          <p>Nous transformons vos défis en solutions innovantes grâce à la programmation et au développement sur mesure.</p>
 
+          <ul>
+              <li><strong>✔ Analyse des besoins :</strong> Comprendre vos défis pour proposer des solutions adaptées.</li>
+              <li><strong>✔ Développement sur mesure :</strong> Création d'applications et d'outils personnalisés.</li>
+              <li><strong>✔ Optimisation continue :</strong> Amélioration des processus pour maximiser votre efficacité.</li>
+          </ul>
+
+          <h1>Nos Solutions</h1>
+          <ul>
+              <li><strong>✔ Automatisation des tâches :</strong> Gagnez du temps en automatisant les processus répétitifs.</li>
+              <li><strong>✔ Gestion des données :</strong> Des outils puissants pour analyser et visualiser vos données.</li>
+              <li><strong>✔ Développement web et mobile :</strong> Des applications modernes et performantes.</li>
+          </ul>
+
+          <div class="button-container">
+              <a href="{{ url_for('menu_principal') }}" class="button">Entrer</a>
+          </div>
+      </div>
+
+    <!-- Script de gestion du mot de passe, placé juste avant la fermeture de body -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const CORRECT_PASSWORD = "votre_mot_de_passe"; // ← À remplacer
+        const form      = document.getElementById("login-form");
+        const input     = document.getElementById("password-input");
+        const errorMsg  = document.getElementById("error-msg");
+        const loginPage = document.getElementById("login-page");
+        const mainPage  = document.getElementById("main-page");
+
+        form.addEventListener("submit", function(e){
+          e.preventDefault();
+          if (input.value === "abcd") {
+            // Authentification réussie
+            loginPage.style.display = "none";
+            mainPage.style.display  = "block";
+          } else {
+            // Mot de passe incorrect
+            errorMsg.style.visibility = "visible";
+            input.value = "";
+          }
+        });
+      });
+    </script>
 </body>
 </html>
