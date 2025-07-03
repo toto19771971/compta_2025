@@ -9,6 +9,13 @@ from sqlalchemy import text, create_engine, inspect
 app = Flask(__name__)
 engine = create_engine('sqlite:///grand_livre.db')
 
+app.secret_key = 'unspoken_greatness_silent_success'
+
+
+
+
+
+
 def load_sheet1(needed_cols, engine):
     insp = inspect(engine)
     all_cols = [c['name'] for c in insp.get_columns('Sheet1')]
@@ -45,6 +52,119 @@ def menu_comptabilite():
 def comptabilite_fournisseurs():
     return render_template('templates_fournisseurs/comptabilite_fournisseurs.html')
 
+
+
+
+
+
+from flask import render_template, send_from_directory, request, redirect, url_for, flash
+import os
+import pandas as pd
+import sqlite3
+
+
+@app.route('/administration')
+def administration():
+    return render_template('templates_administration/administration.html')
+
+
+
+# → Téléchargement d’une BD existante
+@app.route('/download/<path:fname>')
+def download_file(fname):
+    # envoie le fichier fname depuis la racine du projet
+    return send_from_directory(app.root_path, fname, as_attachment=True)
+
+# → Import (upload) d’une nouvelle version de la même BD
+@app.route('/upload/<path:fname>', methods=['POST'])
+def upload_file(fname):
+    f = request.files.get('file')
+    if not f:
+        flash("Aucun fichier sélectionné", "error")
+    else:
+        target = os.path.join(app.root_path, fname)
+        f.save(target)
+        flash(f"{fname} importé avec succès", "success")
+    return redirect(url_for('administration'))
+
+
+
+
+
+
+# 1) Plan comptable (Excel)
+@app.route('/bd_plan_comptable')
+def bd_plan_comptable():
+    fp = os.path.join(app.root_path, 'plan_comptable.xlsx')
+    df = pd.read_excel(fp, dtype=str, keep_default_na=False)
+    return render_template('bd_plan_comptable.html',
+                           columns=df.columns,
+                           rows=df.to_dict(orient='records'))
+
+# 2) Fournisseurs (Excel)
+@app.route('/bd_fournisseurs')
+def bd_fournisseurs():
+    fp = os.path.join(app.root_path, 'bd_fournisseurs.xlsx')
+    df = pd.read_excel(fp, dtype=str, keep_default_na=False)
+    return render_template('bd_fournisseurs.html',
+                           columns=df.columns,
+                           rows=df.to_dict(orient='records'))
+
+# 3) Factures fournisseurs (Excel)
+@app.route('/bd_factures_fournisseurs')
+def bd_factures_fournisseurs():
+    fp = os.path.join(app.root_path, 'bd_factures_fournisseurs.xlsx')
+    df = pd.read_excel(fp, dtype=str, keep_default_na=False)
+    return render_template('bd_factures_fournisseurs.html',
+                           columns=df.columns,
+                           rows=df.to_dict(orient='records'))
+
+# 4) Grand livre (SQLite)
+@app.route('/bd_grand_livre')
+def bd_grand_livre():
+    dbp = os.path.join(app.root_path, 'grand_livre.db')
+    conn = sqlite3.connect(dbp)
+    df = pd.read_sql_query('SELECT * FROM grand_livre', conn)
+    conn.close()
+    return render_template('bd_grand_livre.html',
+                           columns=df.columns,
+                           rows=df.to_dict(orient='records'))
+
+# 5) Clients (Excel)
+@app.route('/bd_clients')
+def bd_clients():
+    fp = os.path.join(app.root_path, 'bd_clients.xlsx')
+    df = pd.read_excel(fp, dtype=str, keep_default_na=False)
+    return render_template('bd_clients.html',
+                           columns=df.columns,
+                           rows=df.to_dict(orient='records'))
+
+# 6) Factures clients (Excel)
+@app.route('/bd_factures_clients')
+def bd_factures_clients():
+    fp = os.path.join(app.root_path, 'bd_factures_clients.xlsx')
+    df = pd.read_excel(fp, dtype=str, keep_default_na=False)
+    return render_template('bd_factures_clients.html',
+                           columns=df.columns,
+                           rows=df.to_dict(orient='records'))
+
+# 7) TVA (Excel)
+@app.route('/bd_tva')
+def bd_tva():
+    fp = os.path.join(app.root_path, 'bd_tva.xlsx')
+    df = pd.read_excel(fp, dtype=str, keep_default_na=False)
+    return render_template('bd_tva.html',
+                           columns=df.columns,
+                           rows=df.to_dict(orient='records'))
+
+# 8) Délais de paiement (Excel)
+@app.route('/bd_delai_paiement')
+def bd_delai_paiement():
+    fp = os.path.join(app.root_path, 'bd_delai_de_paiement.xlsx')
+    df = pd.read_excel(fp, dtype=str, keep_default_na=False)
+    return render_template('bd_delai_paiement.html',
+                           columns=df.columns,
+                           rows=df.to_dict(orient='records'))
 
 
 
@@ -334,26 +454,17 @@ def traitement_salaires():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.route('/recherche_factures_fournisseurs')
 def recherche_factures_fournisseurs():
     fournisseurs = df_fournisseurs.to_dict(orient='records')
+    comptes_plan  = get_accounts()  # liste de dicts {'num_compte': ..., 'intitule': ...}
     return render_template(
         'templates_fournisseurs/recherche_factures_fournisseurs.html',
-        df_fournisseurs=fournisseurs
+        df_fournisseurs=fournisseurs,
+        comptes_plan=comptes_plan
     )
+
+
 
 
 @app.route("/autocomplete_factures_fournisseurs", methods=["GET"])
@@ -446,20 +557,34 @@ def ajouter_facture():
     import pandas as pd, os
     from flask import request, jsonify
 
-    # 1) Charger l’excel existant
+    # pour debug : afficher en console ce qui arrive
+    
+    print("📥 /ajouter_facture reçu, form keys/vals =", request.form.lists())
+
+    # 1) Charger l’Excel
     fp = os.path.join(app.root_path, 'bd_factures_fournisseurs.xlsx')
     df = pd.read_excel(fp, dtype=str, keep_default_na=False)
 
-    # 2) Construire dynamiquement le dict de TOUT le form, y compris les tableaux
-    data = {}
-    for key in request.form.keys():
-        vals = request.form.getlist(key)
-        data[key] = ",".join(vals) if len(vals) > 1 else vals[0]
+    # 2) Construire le dict de TOUTES les données du formulaire
+    data = {
+        key: (';'.join(vals) if len(vals) > 1 else vals[0])
+        for key, vals in request.form.lists()
+    }
 
-    # 3) Ajouter la ligne et sauver
+    # 3) Ajouter et sauvegarder
+    # juste avant l’ajout
+    print("→ Taille avant insertion :", df.shape)
+    # insertion
     df.loc[len(df)] = data
+    # juste après
+    print("→ Taille après insertion :", df.shape)
+    print("→ Nouvelle ligne :", data)
     df.to_excel(fp, index=False)
+    print("✔️ Sauvegarde écrite dans", fp)
+
 
     return jsonify({"message": "Facture ajoutée avec succès !"})
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5005)

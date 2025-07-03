@@ -53,6 +53,58 @@ def comptabilite_fournisseurs():
 
 
 
+@app.route('/administration')
+def administration():
+    return render_template('administration.html')
+
+from flask import send_from_directory
+
+@app.route('/download/<path:fname>')
+def download_file(fname):
+    # suppose vos .xlsx sont dans un dossier "data" à la racine de votre projet
+    return send_from_directory('data', fname, as_attachment=True)
+
+
+
+@app.route('/bd_plan_comptable')
+def bd_plan_comptable():
+    return render_template('templates_administration/bd_plan_comptable.html')
+
+@app.route('/bd_fournisseurs')
+def bd_fournisseurs():
+    return render_template('templates_administration/bd_fournisseurs.html')
+
+@app.route('/bd_grand_livre')
+def bd_grand_livre():
+    return render_template('templates_administration/bd_grand_livre.html')
+
+@app.route('/bd_clients')
+def bd_clients():
+    return render_template('templates_administration/bd_clients.html')
+
+@app.route('/bd_factures_clients')
+def bd_factures_clients():
+    return render_template('templates_administration/bd_factures_clients.html')
+
+@app.route('/bd_tva')
+def bd_tva():
+    return render_template('templates_administration/bd_tva.html')
+
+@app.route('/bd_delai_paiement')
+def bd_delai_paiement():
+    return render_template('templates_administration/bd_delai_paiement.html')
+
+
+@app.route('/bd_factures_fournisseurs')
+def bd_factures_fournisseurs():
+    fp = os.path.join(app.root_path, 'bd_factures_fournisseurs.xlsx')
+    df = pd.read_excel(fp, dtype=str, keep_default_na=False)
+    records = df.to_dict(orient='records')
+    cols    = df.columns.tolist()
+    return render_template(
+        'templates_administration/bd_factures_fournisseurs.html',
+        records=records, columns=cols
+    )
 
 
 
@@ -164,196 +216,6 @@ def liste_fournisseurs():
     df = pd.read_excel(os.path.join(app.root_path,'bd_fournisseurs.xlsx'))
     table_html = df.to_html(classes="table table-striped table-hover table-bordered", index=False, justify="center")
     return render_template('templates_fournisseurs/liste_fournisseurs.html', table_html=table_html)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@app.route('/recherche_factures_fournisseurs')
-def recherche_factures_fournisseurs():
-    fournisseurs = df_fournisseurs.to_dict(orient='records')
-    return render_template(
-        'templates_fournisseurs/recherche_factures_fournisseurs.html',
-        df_fournisseurs=fournisseurs
-    )
-
-
-@app.route("/autocomplete_factures_fournisseurs", methods=["GET"])
-def autocomplete_factures_fournisseurs():
-    q = request.args.get("query", "").strip().lower()
-    if not q:
-        return jsonify([])
-    res = df_fournisseurs[
-        df_fournisseurs["Nom du fournisseur"].str.lower().str.startswith(q)
-    ].to_dict(orient='records')
-    return jsonify(res)
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Dans app.py, remplacez entièrement votre fonction ajouter_facture par :
-@app.route('/ajouter_facture', methods=['POST'])
-def ajouter_facture():
-    import pandas as pd, os
-    fp = os.path.join(app.root_path, 'bd_factures_fournisseurs.xlsx')
-    df = pd.read_excel(fp, dtype=str, keep_default_na=False)
-
-    data = {
-        'Fournisseur':           request.form.get('Fournisseur',''),
-        'No compte Fournisseur': request.form.get('No compte Fournisseur',''),
-        'Condition de paiement': request.form.get('Condition de paiement',''),
-        'Date de facture':       request.form.get('Date de facture',''),
-        'Date échéance':         request.form.get('Date échéance',''),
-        'Date paiement prévue':  request.form.get('Date paiement prévue',''),
-        'Période':               request.form.get('Période',''),
-        'Montant':               request.form.get('Montant',''),
-        'Balance':               request.form.get('Balance',''),
-        'No de facture':         request.form.get('No de facture',''),
-        'No de commande':        request.form.get('No de commande',''),
-        'Statut':                request.form.get('Statut',''),
-        'compte[]':              ','.join(request.form.getlist('compte[]')),
-        'intitule[]':            ','.join(request.form.getlist('intitule[]')),
-        'quantite[]':            ','.join(request.form.getlist('quantite[]')),
-        'unite[]':               ','.join(request.form.getlist('unite[]')),
-        'montant[]':             ','.join(request.form.getlist('montant[]')),
-        'tva[]':                 ','.join(request.form.getlist('tva[]')),
-        'compte_tva[]':          ','.join(request.form.getlist('compte_tva[]')),
-        'libelle_taxe[]':        ','.join(request.form.getlist('libelle_taxe[]')),
-        'taux_taxe[]':           ','.join(request.form.getlist('taux_taxe[]')),
-        'montant_taxe[]':        ','.join(request.form.getlist('montant_taxe[]')),
-        'taxe[]':                ','.join(request.form.getlist('taxe[]')),
-        'total_ttc':             request.form.get('total_ttc','')
-    }
-
-    df.loc[len(df)] = data
-    df.to_excel(fp, index=False)
-    return jsonify({"message":"Facture ajoutée avec succès !"})
-
-
-
-
-# app.py
-
-# app.py – route mise à jour factures
-@app.route('/mettre_a_jour_facture', methods=['POST'])
-def mettre_a_jour_facture():
-    import pandas as pd, os
-    data = request.form.to_dict()
-    file_path = os.path.join(app.root_path, 'bd_factures_fournisseurs.xlsx')
-    df = pd.read_excel(file_path, dtype=str, keep_default_na=False)
-    # récupère l’ancien numéro ou tombe sur le nouveau si absent
-    original = data.get('original_num_facture') or data.get('No de facture')
-    idx = df[df['No de facture'] == original].index
-    if idx.empty:
-        return jsonify({'message':'Facture non trouvée !'}), 404
-    for k, v in data.items():
-        df.at[idx[0], k] = v
-    df.to_excel(file_path, index=False)
-    return jsonify({'message':'Facture mise à jour avec succès !'}), 200
-
-
-
-
-
-
-
-@app.route('/liste_factures_fournisseurs')
-def liste_factures_fournisseurs():
-    import pandas as pd, os
-    file_path = os.path.join(app.root_path, 'bd_factures_fournisseurs.xlsx')
-    df = pd.read_excel(file_path, dtype=str, keep_default_na=False)
-    table_html = df.to_html(
-        classes="table table-striped table-hover table-bordered",
-        index=False,
-        justify="center"
-    )
-    return render_template(
-        'templates_fournisseurs/liste_factures_fournisseurs.html',
-        table_html=table_html
-    )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -484,6 +346,176 @@ def gestion_employes():
 def traitement_salaires():
     return render_template('templates_rh/traitement_salaires.html')
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route('/recherche_factures_fournisseurs')
+def recherche_factures_fournisseurs():
+    fournisseurs = df_fournisseurs.to_dict(orient='records')
+    comptes_plan  = get_accounts()  # liste de dicts {'num_compte': ..., 'intitule': ...}
+    return render_template(
+        'templates_fournisseurs/recherche_factures_fournisseurs.html',
+        df_fournisseurs=fournisseurs,
+        comptes_plan=comptes_plan
+    )
+
+
+
+
+@app.route("/autocomplete_factures_fournisseurs", methods=["GET"])
+def autocomplete_factures_fournisseurs():
+    q = request.args.get("query", "").strip().lower()
+    if not q:
+        return jsonify([])
+    res = df_fournisseurs[
+        df_fournisseurs["Nom du fournisseur"].str.lower().str.startswith(q)
+    ].to_dict(orient='records')
+    return jsonify(res)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# app.py
+
+# app.py – route mise à jour factures
+@app.route('/mettre_a_jour_facture', methods=['POST'])
+def mettre_a_jour_facture():
+    import pandas as pd, os
+    data = request.form.to_dict()
+    file_path = os.path.join(app.root_path, 'bd_factures_fournisseurs.xlsx')
+    df = pd.read_excel(file_path, dtype=str, keep_default_na=False)
+    # récupère l’ancien numéro ou tombe sur le nouveau si absent
+    original = data.get('original_num_facture') or data.get('No de facture')
+    idx = df[df['No de facture'] == original].index
+    if idx.empty:
+        return jsonify({'message':'Facture non trouvée !'}), 404
+    for k, v in data.items():
+        df.at[idx[0], k] = v
+    df.to_excel(file_path, index=False)
+    return jsonify({'message':'Facture mise à jour avec succès !'}), 200
+
+
+
+
+
+
+
+@app.route('/liste_factures_fournisseurs')
+def liste_factures_fournisseurs():
+    import pandas as pd, os
+    file_path = os.path.join(app.root_path, 'bd_factures_fournisseurs.xlsx')
+    df = pd.read_excel(file_path, dtype=str, keep_default_na=False)
+    table_html = df.to_html(
+        classes="table table-striped table-hover table-bordered",
+        index=False,
+        justify="center"
+    )
+    return render_template(
+        'templates_fournisseurs/liste_factures_fournisseurs.html',
+        table_html=table_html
+    )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route('/ajouter_facture', methods=['POST'])
+def ajouter_facture():
+    import pandas as pd, os
+    from flask import request, jsonify
+
+    # pour debug : afficher en console ce qui arrive
+    
+    print("📥 /ajouter_facture reçu, form keys/vals =", request.form.lists())
+
+    # 1) Charger l’Excel
+    fp = os.path.join(app.root_path, 'bd_factures_fournisseurs.xlsx')
+    df = pd.read_excel(fp, dtype=str, keep_default_na=False)
+
+    # 2) Construire le dict de TOUTES les données du formulaire
+    data = {
+        key: (';'.join(vals) if len(vals) > 1 else vals[0])
+        for key, vals in request.form.lists()
+    }
+
+    # 3) Ajouter et sauvegarder
+    # juste avant l’ajout
+    print("→ Taille avant insertion :", df.shape)
+    # insertion
+    df.loc[len(df)] = data
+    # juste après
+    print("→ Taille après insertion :", df.shape)
+    print("→ Nouvelle ligne :", data)
+    df.to_excel(fp, index=False)
+    print("✔️ Sauvegarde écrite dans", fp)
+
+
+    return jsonify({"message": "Facture ajoutée avec succès !"})
 
 
 if __name__ == "__main__":
