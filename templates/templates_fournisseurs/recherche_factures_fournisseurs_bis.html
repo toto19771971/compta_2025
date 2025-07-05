@@ -202,9 +202,18 @@
     </template>
 
   </form>
+  
 
   <!-- Calcul et ajout de lignes -->
   <script>
+  
+  
+   
+  
+
+
+
+
     document.addEventListener('DOMContentLoaded', () => {
       const invBody   = document.getElementById('invoice-body');
       const taxBody   = document.getElementById('tax-body');
@@ -254,10 +263,10 @@
 
       recalcTotal();
     });
-  </script>
+  
 
   <!-- Autoremplissage du fournisseur -->
-  <script>
+  
     document.getElementById('fournisseur').addEventListener('input', async function() {
       const v = this.value.trim();
       if (!v) return;
@@ -277,30 +286,70 @@
       taxRow.querySelector('[name="compte_tva[]"]').value  = f['Compte TVA'];
       taxRow.querySelector('[name="taux_tva[]"]').value    = f['Taux TVA 1'];
     });
-  </script>
+  
 
-  <!-- Handler “Créer” -->
-  <script>
-    document.getElementById('btn-create-facture').addEventListener('click', async e => {
-      e.preventDefault();
-      const formEl = document.getElementById('factureContainer');
-      const formData = new FormData(formEl);
-      console.log("📤 Données envoyées :", [...formData.entries()]);
+  
+    document.getElementById('btnCreate').addEventListener('click', async () => {
+          const formEl = document.getElementById('invoice-form');
 
-      const res  = await fetch('/ajouter_facture', { method: 'POST', body: formData });
-      const json = await res.json();
-      alert(json.message || 'Facture créée !');
+          // ── LOG POINT 1 : Vérifier le contenu du form ──
+          // But : s’assurer que TOUT input (statique + dynamique) est dans le form
+          const allInputs = formEl.querySelectorAll('input');
+          console.log(
+            '%c[LOG 1] Total inputs INSIDE <form>:', 
+            'color: white; background: navy; padding:2px;',
+            allInputs.length, allInputs
+          );
+          // But : FormData ne serialise que les inputs avec un name
+          const namedInputs = Array.from(allInputs).filter(i => i.name);
+          console.log(
+            '%c[LOG 1] Inputs WITH name (=> sérialisés):', 
+            'color: white; background: darkgreen; padding:2px;',
+            namedInputs.length, namedInputs
+          );
+          // Attendu : namedInputs.length === allInputs.length
 
-      formEl.reset();
-      document.getElementById('invoice-body').innerHTML = '';
-      document.getElementById('tax-body').innerHTML     = '';
-      document.getElementById('invoice-body').appendChild(document.importNode(tplInv, true));
-      document.getElementById('tax-body').appendChild(document.importNode(tplTax, true));
-    });
-  </script>
+          // ── LOG POINT 2 : Création et inspection du FormData ──
+          const formData = new FormData(formEl);
+          // But : voir exactement ce que FormData a capturé
+          console.table(
+            Array.from(formData.entries()),
+            ['0: key', '1: value']
+          );
+          // Attendu : on doit voir TOUTES vos paires clé=valeur, 
+          // y compris compte[], qty[], unit_price[]…
 
-  <!-- Handler “Vider” -->
-  <script>
+          // ── LOG POINT 3 : Afficher la payload brute avant fetch ──
+          // (nécessite browser récent supportant FormData.prototype.get)
+          if (typeof formData.get === 'function') {
+            console.log(
+              '%c[LOG 3] Vérif valeurs exemple (invoice_lines[0][description]):',
+              'color: black; background: lightgrey;',
+              formData.get('invoice_lines[0][description]')
+            );
+          }
+
+          // ── ENVOI ──
+          try {
+            const res = await fetch('/ajouter_facture', {
+              method: 'POST',
+              body: formData
+            });
+            const txt = await res.text();
+            console.log(
+              '%c[LOG FETCH] Statut:', 
+              `color: ${res.ok ? 'green' : 'red'};`, 
+              res.status, txt
+            );
+          } catch (err) {
+            console.error('%c[LOG FETCH] Erreur réseau:', 'color: red;', err);
+          }
+        });
+     
+  
+
+  
+  
     document.getElementById('btn-clear').addEventListener('click', () => {
       const formEl = document.getElementById('factureContainer');
       formEl.reset();
@@ -309,7 +358,7 @@
       document.getElementById('invoice-body').appendChild(document.importNode(tplInv, true));
       document.getElementById('tax-body').appendChild(document.importNode(tplTax, true));
     });
-  </script>
+  </script>  
 
 </body>
 </html>
