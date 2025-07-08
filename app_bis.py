@@ -52,11 +52,6 @@ def get_connection():
 def index():
     return render_template('index.html')
 
-@app.route('/en_construction')
-def en_construction():
-    return render_template('en_construction.html')
-
-
 @app.route('/menu_principal')
 def menu_principal():
     return render_template('menu_principal.html')

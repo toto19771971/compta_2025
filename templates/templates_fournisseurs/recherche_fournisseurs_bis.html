@@ -63,7 +63,7 @@
     <button onclick="window.print()">Imprimer</button>
     <button id="btn-create" type="button">Créer</button>
     <button id="btn-update" type="button">MAJ</button>
-    <button onclick="location.href='/liste_factures_fournisseurs'">Liste</button>
+    <button onclick="location.href='/liste_fournisseurs'">Liste</button>
     <button onclick="viderFormulaire()" type="button">Vider</button>
   </div>
 
@@ -252,7 +252,7 @@
         const v = this.value.trim();
         if (!v) return;
         const res = await fetch(
-          '/autocomplete_factures_fournisseurs?query='+encodeURIComponent(v)
+          '/autocomplete?query='+encodeURIComponent(v)
         );
         if (!res.ok) return;
         const arr = await res.json();
@@ -275,3 +275,5 @@
 
 </body>
 </html>
+
+

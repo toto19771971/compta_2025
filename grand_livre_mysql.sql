@@ -273,3 +273,5 @@ INSERT INTO "Sheet2" ("compte","classe","groupe","sous_groupe","classe_label","g
  (9000,9,90,900,'Actif','Actif','Compte de résultat 1','Bilan'),
  (9001,9,90,900,'Actif','Actif','Compte de résultat 2','Bilan');
 COMMIT;
+
+

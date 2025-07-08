@@ -1,0 +1,82 @@
+# ─── Bloc Grand Livre Indépendant ───
+   
+# ────────────────────────────────────────────────────────────────────────────────
+# Route dédiée à la publication dans le Grand Livre
+# ────────────────────────────────────────────────────────────────────────────────
+@app.route('/publier_grand_livre', methods=['POST'])
+def publier_grand_livre():
+    # 1) Récupérer raw form data
+    raw = { k: request.form.getlist(k) for k in request.form.keys() }
+
+    # 2) Extraire listes de valeurs
+    fournisseurs       = raw.get('No compte Fournisseur', [])
+    comptes_invoice     = raw.get('compte[]', [])
+    brut_values         = raw.get('base_ht[]', [])
+    comptes_tva         = raw.get('compte_tva[]', [])
+    tva_values          = raw.get('montant_tva[]', [])
+
+    # 3) ouvrir connexion et curseur
+    conn = engine.raw_connection()
+    cur  = conn.cursor()
+
+    # 4) Pour chaque ligne facturation, écrire 3 écritures comptables
+    for i in range(len(comptes_invoice)):
+        # convertir chaînes en float
+        brut = float(brut_values[i] or 0)
+        tva  = float(tva_values[i]  or 0)
+        # total crédit fournisseur
+        total_credit = brut + tva
+
+        # a) Créditer le compte fournisseur
+        cur.execute("""
+            INSERT INTO Sheet1 (
+                "N° compte","Période","Date",
+                "Libellé","Fournisseur","Débit","Crédit"
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            fournisseurs[i],          # compte fournisseur
+            raw.get('Période', [''])[0],
+            raw.get('Date de facture', [''])[0],
+            f"Facture – ligne {i+1}",
+            raw.get('Fournisseur', [''])[0],
+            0,                        # débit
+            total_credit
+        ))
+
+        # b) Débiter le compte de charge (invoice)
+        cur.execute("""
+            INSERT INTO Sheet1 (
+                "N° compte","Période","Date",
+                "Libellé","Fournisseur","Débit","Crédit"
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            comptes_invoice[i],       # compte CDEBIT
+            raw.get('Période', [''])[0],
+            raw.get('Date de facture', [''])[0],
+            f"Brut – ligne {i+1}",
+            '',                       # pas de fournisseur ici
+            brut,
+            0
+        ))
+
+        # c) Débiter le compte TVA
+        cur.execute("""
+            INSERT INTO Sheet1 (
+                "N° compte","Période","Date",
+                "Libellé","Fournisseur","Débit","Crédit"
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            comptes_tva[i],           # compte TVA
+            raw.get('Période', [''])[0],
+            raw.get('Date de facture', [''])[0],
+            f"TVA – ligne {i+1}",
+            '',
+            tva,
+            0
+        ))
+
+    # 5) valider et fermer
+    conn.commit()
+    cur.close()
+
+    return jsonify({"message": "Grand Livre mis à jour avec succès !"})

@@ -42,3 +42,5 @@ function supprimerFournisseur() {
       .then(response => response.text())
       .then(alert);
 }
+
+

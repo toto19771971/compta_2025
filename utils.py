@@ -17,3 +17,5 @@ def load_sheet1(needed_cols):
         raise ValueError(f"Aucune des colonnes demandées {needed_cols} n'existe dans Sheet1.")
     sql = "SELECT " + ", ".join(f"`{c}`" for c in cols) + " FROM Sheet1"
     return pd.read_sql_query(sql, engine)
+
+
