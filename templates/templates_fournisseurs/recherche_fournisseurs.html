@@ -1,0 +1,352 @@
+<!-- File : templates_fournisseurs/recherche_fournisseurs.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="static/style_fournisseurs.css?v=3" type="text/css" />
+  <meta charset="UTF-8">
+  <title>Recherche fournisseurs</title>
+  <style>
+    h1 { text-align: center; }
+    .buttons { display: flex; flex-wrap: nowrap; gap: 10px; margin-bottom: 15px; }
+    .buttons button { border: none; padding: 10px 15px; cursor: pointer; font-size: 16px; border-radius: 5px; }
+    .buttons button:hover { }
+    .suggestions { border: 1px solid #ccc; max-height: 150px; overflow-y: auto; position: absolute; width: 250px; z-index: 10; }
+    .suggestions div { padding: 5px; cursor: pointer; }
+    .suggestions div:hover { }
+    .mandatory::after { content: " *"; }
+    .form-group { margin-bottom: 10px; }
+    label { display: block; margin-bottom: 5px; }
+    input, select, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
+    .container { max-width: 600px; margin: 0 auto; }
+
+    /* flèche toujours visible pour tous les inputs à datalist */
+    input[list] {
+      -webkit-appearance: menulist-textfield !important;
+      appearance: menulist-textfield !important;
+    }
+
+
+
+
+
+  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style_fournisseurs.css') }}">
+</head>
+<body class="suppliers-body" class="suppliers-body">
+  <div class="container">
+    <h1>Gestion des Fournisseurs</h1>
+    <div class="toolbar" style="display:flex; flex-wrap:nowrap; gap:10px;">
+      <button class="action-btn" type="button" onclick="imprimer()">Imprimer</button>
+      <button class="action-btn" type="button" onclick="ouvrirWikipedia()">Wikipédia</button>
+      <button class="action-btn" type="button" onclick="creer()">Créer</button>
+      <button class="action-btn" type="button" onclick="rechercherFournisseur()">Chercher</button>
+      <button class="action-btn" type="button" onclick="modifier()">Modifier</button>
+      <button class="action-btn" type="button" id="btn-liste-fournisseurs">Liste fournisseurs</button>
+      <button class="action-btn" type="button" onclick="retour()">Retour</button>
+    </div>
+
+    <div id="zone-recherche" style="display: none; position: relative;">
+      <label for="search-input">🔍 Rechercher :</label>
+      <input type="text" id="search-input" placeholder="Tapez un nom ou un code...">
+      <div id="suggestions" class="suggestions"></div>
+    </div>
+
+    <form id="formulaire">
+      <div class="form-group">
+        <label class="mandatory" for="code_fournisseur">Code fournisseur</label>
+        <input type="text" id="code_fournisseur" name="Code fournisseur" required list="liste_codes">
+        <datalist id="liste_codes">
+          {% for f in df_fournisseurs %}
+            <option value="{{ f['Code fournisseur'] }}"></option>
+          {% endfor %}
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label class="mandatory" for="nom_fournisseur">Nom du fournisseur</label>
+        <input type="text" id="nom_fournisseur" name="Nom du fournisseur" required list="liste_noms">
+        <datalist id="liste_noms">
+          {% for f in df_fournisseurs %}
+            <option value="{{ f['Nom du fournisseur'] }}"></option>
+          {% endfor %}
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label for="personne_responsable">Personne responsable</label>
+        <input type="text" id="personne_responsable" name="Personne responsable">
+      </div>
+
+      <div class="form-group">
+        <label for="adresse">Adresse</label>
+        <input type="text" id="adresse" name="Adresse">
+      </div>
+
+      <div class="form-group">
+        <label for="npa_ville">NPA/Ville</label>
+        <input type="text" id="npa_ville" name="NPA/Ville">
+      </div>
+
+      <div class="form-group">
+        <label class="mandatory" for="no_telephone_1">No téléphone 1</label>
+        <input type="text" id="no_telephone_1" name="No téléphone 1" required>
+      </div>
+
+      <div class="form-group">
+        <label for="no_telephone_2">No téléphone 2</label>
+        <input type="text" id="no_telephone_2" name="No téléphone 2">
+      </div>
+
+      <div class="form-group">
+        <label for="site_internet">Site internet</label>
+        <input type="text" id="site_internet" name="Site internet">
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="E-mail">
+      </div>
+
+      <div class="form-group">
+        <label class="mandatory" for="compte_a_crediter">Compte à créditer</label>
+
+        <input type="text" id="compte_a_crediter" name="Compte à créditer" required list="liste_comptes_plan">
+        <datalist id="liste_comptes_plan">
+          {% for c in comptes_plan %}<option value="{{ c.num_compte }} – {{ c.intitule }}"></option>{% endfor %}
+        </datalist>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+      </div>
+
+      <div class="form-group">
+        <label class="mandatory" for="compte_a_debiter">Compte à débiter</label>
+        <input type="text" id="compte_a_debiter" name="Compte à débiter" required list="liste_comptes_plan">
+        <datalist id="liste_comptes_plan">
+          {% for c in comptes_plan %}<option value="{{ c.num_compte }} – {{ c.intitule }}"></option>{% endfor %}
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label class="mandatory" for="taux_tva1">Taux TVA 1</label>
+        <input type="text" id="taux_tva1" name="Taux TVA 1" required list="liste_tva">
+        <datalist id="liste_tva">
+          {% for t in tva_options %}<option value="{{ t['Taux TVA'] }}"></option>{% endfor %}
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label class="mandatory" for="compte_tva">Compte TVA</label>
+        <input type="text" id="compte_tva" name="Compte TVA" required list="liste_comptes_plan">
+        <datalist id="liste_comptes_plan">
+          {% for c in comptes_plan %}
+            <option value="{{ c.num_compte }} - {{ c.intitule }}"></option>
+          {% endfor %}
+        </datalist>
+      </div>
+
+
+
+      <div class="form-group">
+        <label for="taux_tva2">Taux TVA 2</label>
+        <input type="text" id="taux_tva2" name="Taux TVA 2" required list="liste_tva">
+        <datalist id="liste_tva">
+          {% for t in tva_options %}<option value="{{ t['Taux TVA'] }}"></option>{% endfor %}
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label class="mandatory" for="delai_de_paiement">Délai de paiement</label>
+        <input type="text" id="delai_de_paiement" name="Délai de paiement" required list="liste_delai">
+        <datalist id="liste_delai">
+          {% for d in delai_options %}<option value="{{ d['Délai de paiement'] }}"></option>{% endfor %}
+        </datalist>
+      </div>
+
+      <div class="form-group">
+        <label for="nom_de_la_banque">Nom de la banque</label>
+        <input type="text" id="nom_de_la_banque" name="Nom de la banque">
+      </div>
+
+      <div class="form-group">
+        <label for="npa_ville_banque">NPA/Ville banque</label>
+        <input type="text" id="npa_ville_banque" name="NPA/Ville banque">
+      </div>
+
+      <div class="form-group">
+        <label for="no_de_compte">No de compte</label>
+        <input type="text" id="no_de_compte" name="No de compte">
+      </div>
+
+      <div class="form-group">
+        <label for="iban">IBAN</label>
+        <input type="text" id="iban" name="IBAN">
+      </div>
+
+      <div class="form-group">
+        <label for="commentaire">Commentaire</label>
+        <textarea id="commentaire" name="Commentaire"></textarea>
+      </div>
+    </form>
+    <div class="form-actions" style="text-align: center; margin-top: 20px;">
+      <button
+        type="button"
+        class="action-btn"
+        onclick="viderFormulaire()"
+        style="width: 160px; height: 40px; margin: 0 auto; display: inline-block;">
+        Vider le formulaire
+      </button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('btn-liste-fournisseurs')
+      .addEventListener('click', ()=> window.location.href='{{ url_for("liste_fournisseurs") }}');
+
+    const mapping = {
+      "Code fournisseur":     "code_fournisseur",
+      "Nom du fournisseur":   "nom_fournisseur",
+      "Personne responsable": "personne_responsable",
+      "Adresse":              "adresse",
+      "NPA/Ville":            "npa_ville",
+      "No téléphone 1":       "no_telephone_1",
+      "No téléphone 2":       "no_telephone_2",
+      "Site internet":        "site_internet",
+      "E-mail":               "email",
+      "Compte à créditer":    "compte_a_crediter",
+      "Compte à débiter":     "compte_a_debiter",
+      "Taux TVA 1":           "taux_tva1",
+      "Compte TVA":           "compte_tva",
+      "Taux TVA 2":           "taux_tva2",
+      "Délai de paiement":    "delai_de_paiement",
+      "Nom de la banque":     "nom_de_la_banque",
+      "NPA/Ville banque":     "npa_ville_banque",
+      "No de compte":         "no_de_compte",
+      "IBAN":                 "iban",
+      "Commentaire":          "commentaire"
+    };
+
+    function remplirFormulaire(f) {
+      for (const [col, id] of Object.entries(mapping)) {
+        const el = document.getElementById(id);
+        if (el) el.value = f[col] || "";
+      }
+    }
+
+   ["code_fournisseur","nom_fournisseur"].forEach(idInput => {
+  const inp = document.getElementById(idInput);
+  const listId = inp.getAttribute('list');
+    inp.addEventListener('change', function() {
+
+
+
+
+    const v = this.value.trim();
+    if (v) {
+        const url = idInput==='nom_fournisseur'
+          ? '/autocomplete_nom?query='+encodeURIComponent(v)
+          : '/autocomplete?query='+encodeURIComponent(v);
+        fetch(url)
+
+        .then(r=>r.json())
+        .then(res=>{
+          const list = document.getElementById(listId);
+          list.innerHTML = "";
+          res
+            .filter(f=>{
+              const val = idInput==="code_fournisseur"
+                ? f["Code fournisseur"]
+                : f["Nom du fournisseur"];
+              return val.toLowerCase().startsWith(v.toLowerCase());
+            })
+            .forEach(f=>{
+              const opt = document.createElement("option");
+              opt.value = idInput==="code_fournisseur"
+                ? f["Code fournisseur"]
+                : f["Nom du fournisseur"];
+              list.appendChild(opt);
+            });
+          if(list.options.length) remplirFormulaire(res[0]);
+        });
+
+
+    } else {
+      Object.values(mapping).forEach(id=>{
+        if (id!==idInput) document.getElementById(id).value="";
+      });
+    }
+          });
+
+
+});
+
+
+    function rechercherFournisseur() {
+      const code = document.getElementById('code_fournisseur').value.trim();
+      const nom  = document.getElementById('nom_fournisseur').value.trim();
+      const v    = code || nom;
+      if (!v) return alert('Tapez un code ou un nom');
+      const url  = code
+        ? '/autocomplete_code?query=' + encodeURIComponent(v)
+        : '/autocomplete_nom?query=' + encodeURIComponent(v);
+      fetch(url)
+        .then(r => r.json())
+        .then(res => {
+          if (res.length) remplirFormulaire(res[0]);
+          else alert('Aucun résultat trouvé');
+        });
+    }
+
+
+
+
+
+
+    function retour(){ window.location.href='{{ url_for("comptabilite_fournisseurs") }}'; }
+    function imprimer(){ window.print(); }
+    function ouvrirWikipedia(){ window.open("https://fr.wikipedia.org","_blank"); }
+
+
+
+    function creer(){
+      fetch('/creer', {
+        method: 'POST',
+        body: new FormData(document.getElementById('formulaire'))
+      })
+      .then(r=>r.json()).then(j=>alert(j.message));
+    }
+
+
+
+    function modifier(){
+      fetch('/modifier', {
+        method: 'POST',
+        body: new FormData(document.getElementById('formulaire'))
+      })
+      .then(r=>r.json()).then(j=>alert(j.message));
+    }
+
+
+
+
+    function supprimer(){ /* inchangé */ }
+    function viderFormulaire(){ document.getElementById("formulaire").reset(); }
+  </script>
+</body>
+</html>
+
+
+
+
+
+

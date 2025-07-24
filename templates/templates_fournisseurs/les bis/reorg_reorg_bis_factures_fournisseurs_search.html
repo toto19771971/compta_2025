@@ -1,0 +1,163 @@
+<!-- ===== TEMPLATE ORGANISÉ (auto généré) ===== -->
+<!-- ===== TEMPLATE ORGANISÃ (auto gÃ©nÃ©rÃ©) ===== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="static/style_fournisseurs.css?v=3" type="text/css" />
+  <meta charset="UTF-8">
+  <title>Gestion des Fournisseurs</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    .container { max-width: 1000px; margin: auto; padding: 20px; }
+    .title { text-align: center; margin-top: 40px; font-size: 28px; font-weight: bold; }
+    .button-bar { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
+    .button-bar .btn { padding: 12px 20px; font-size: 16px; border: none; border-radius: 6px; box-shadow: 0 2px 4px rgba(204, 32, 32, 0.947); cursor: pointer; transition: background .2s; }
+    .button-bar .btn:hover { }
+    form { display: flex; gap: 2cm; margin-top: 40px; }
+    .left-fields, .right-fields { display: flex; flex-direction: column; gap: 3mm; flex: 1; }
+    label { font-size: 14px; }
+    input, select { padding: 6px; font-size: 14px; width: 100%; }
+    .left-fields select {box-sizing: border-box; width: 100%;}
+
+    .btn-primary {padding: 8px 14px;font-size: 14px;border: none;border-radius: 4px;cursor: pointer;transition: background 0.2s;}
+    .btn-primary:hover {
+    }
+    @media (max-width: 600px) { form { flex-direction: column; } .submit-container { justify-content: center; } }
+    .fields {
+      display: flex;
+      gap: 1cm;
+    }
+   
+    /* 1) On conserve vos deux colonnes cÃÂ´te ÃÂ  cÃÂ´te */
+    form .fields {
+      display: flex;
+      gap: 2cm;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column; /* pour empiler fields puis .submit */
+      gap: 2rem;              /* espace gÃÂ©nÃÂ©ral */
+    }
+
+            /* 1) On force le bouton ÃÂ  ÃÂªtre un bloc */
+    .btn-action {
+      display: block !important;
+      text-align: center !important;
+      font-weight: bold !important;
+      
+      /* 2) On le dÃÂ©cale ÃÂ  droite de son conteneur */
+      margin: 2rem 0 0 auto !important;
+      /* /* 2) on laisse le conteneur sÃ¢ÂÂadapter au texte */
+      width: 200px !important;
+      height: auto !important;
+      padding: o,1rem 0 !important;
+
+      /* on centre son texte */
+      /*display: flex !important;*/
+      align-items: center !important;
+      justify-content: center !important;
+
+    }
+
+  </style>
+</head>
+<body class="suppliers-body" class="suppliers-body">
+  <div class="container">
+    <nav class="toolbar" style="display:flex; justify-content:center; gap:10px; margin-bottom:60px; margin-top:30px;">
+      <button id="btn-retour"          class="btn" onclick="openRetour()">RETOUR</button>
+      <button id="btn-aide"            class="btn" onclick="openAide()">AIDE</button>
+      <button id="btn-imprimer"        class="btn" onclick="openImprimer()">IMPRIMER</button>
+      <button id="btn-liste-fournisseurs" class="btn" onclick="openListeFournisseurs()">LISTE FOURNISSEURS</button>
+      <button id="btn-facture-fournisseur" class="btn" onclick="openFactureFournisseur()">FACTURE FOURNISSEUR</button>
+      <button id="btn-paiement"        class="btn" onclick="openPaiement()">PAIEMENT</button>
+    </nav>
+
+    <div class="title">Gestion des Fournisseurs</div>
+    
+      <form id="search-form"
+            action="{{ url_for('factures_fournisseurs_result') }}"
+            method="get">
+        <div class="fields">
+          <div class="left-fields">
+            <label>Code fournisseur :
+              <input type="text" name="code_fournisseur" id="code_fournisseur">
+            </label>
+            <label>Fournisseur :
+              <input type="text" name="nom_fournisseur" id="nom_fournisseur">
+            </label>
+            <label>NÃÂ° de PO :
+              <input type="text" name="po_number">
+            </label>
+            <label>PayÃÂ© :
+              <select name="statut_paye">
+                <option value="non-payÃÂ©e" selected>NON</option>
+                <option value="payÃÂ©e">OUI</option>
+                <option value="ensemble">ENSEMBLE</option>
+              </select>
+            </label>
+          </div>
+          <div class="right-fields">
+            <label>Date de facture : De
+              <input type="date" name="date_facture_de">
+            </label>
+            <label>ÃÂ 
+              <input type="date" name="date_facture_a">
+            </label>
+            <label>Date dÃ¢ÂÂÃÂ©chÃÂ©ance : De
+              <input type="date" name="date_echeance_de">
+            </label>
+            <label>ÃÂ 
+              <input type="date" name="date_echeance_a">
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions" style="text-align:right; margin-top:2rem;">
+          <button type="submit" class="action-btn">
+            RECHERCHER
+          </button>
+        </div>
+      </form>    
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // 1) Define dropdown handlers
+        window.openListeFournisseurs    = ()=>alert('Liste fournisseurs');
+        window.openFactureFournisseur   = ()=>alert('Factures fournisseur');
+        window.openPaiement             = ()=>alert('Paiement');
+
+        // 2) Attach top-button listeners
+        document.getElementById('btn-liste-fournisseurs')
+                .addEventListener('click', openListeFournisseurs);
+        document.getElementById('btn-facture-fournisseur')
+                .addEventListener('click', openFactureFournisseur);
+        document.getElementById('btn-paiement')
+                .addEventListener('click', openPaiement);
+
+        // 3) Autocomplete setup
+        function setupAutocomplete(id, url) {
+          const input = document.getElementById(id);
+          const dl    = document.createElement('datalist');
+          dl.id       = id + '-list';
+          document.body.appendChild(dl);
+          input.setAttribute('list', dl.id);
+
+          let timer;
+          input.addEventListener('input', () => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+              fetch(url + '?q=' + encodeURIComponent(input.value))
+                .then(r => r.json())
+                .then(arr => { dl.innerHTML = arr.map(v => `<option value="${v}">`).join(''); });
+            }, 300);
+          });
+        }
+        setupAutocomplete('code_fournisseur', '/api/autocomplete/code_api');
+        setupAutocomplete('nom_fournisseur',  '/api/autocomplete/nom_api');
+      });
+    </script>
+
+</body>
+</html>
+

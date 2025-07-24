@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="static/style_fournisseurs.css?v=3" type="text/css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comptabilité fournisseurs</title>
+    <link rel="stylesheet" <!-- Dans votre template, incluez d'abord style_principal.css, puis style_fournisseurs.css -->
+    
+    
+    <style>
+    .container {background-color: #ffffff; }
+
+    /* style_principal.css : mise en page commune, sans couleurs */
+        body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        }
+
+        .container {
+        text-align: center;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Effet d'ombre */
+        }
+
+        .logo {
+        width: 300px;
+        height: auto;
+        margin-bottom: 20px;
+        }
+
+        h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        /* color retiré */
+        }
+
+        .button-container {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: 1fr;
+        }
+
+        .custom-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 25px 60px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 20px;
+        /* background-color, border, color retirés */
+        transition: background-color 0.3s, border-color 0.3s;
+        width: 400px;
+        }
+
+        .custom-button:hover {
+        /* background-color, border-color retirés */
+        transition: background-color 0.3s, border-color 0.3s;
+        }
+
+    </style>    
+    
+</head>
+<body class="suppliers-body" class="suppliers-body">
+    <div class="container">
+        <h1>Comptabilité fournisseurs</h1>
+        <div class="button-container">
+                <a href="{{ url_for('factures_fournisseurs_ecriture') }}" class="custom-button">
+                    Factures fournisseurs et notes de crédit
+                </a>
+                <a href="{{ url_for('recherche_fournisseurs')}}" class="custom-button">
+                    Liste des fournisseurs
+                </a>
+                <a href="#" class="custom-button">
+                    Paiements en attente
+                </a>
+                <a href="#" class="custom-button">
+                     Factures fournisseurs mémorisées
+                </a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+

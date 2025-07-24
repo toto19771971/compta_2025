@@ -1,0 +1,284 @@
+<!-- ===== TEMPLATE ORGANISÉ (auto généré) ===== -->
+<!-- DUPLIQUÉS de <table>: 2 occurrences ===== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="static/style_fournisseurs.css?v=3" type="text/css" />
+  <meta charset="UTF-8">
+  <title>Prototype IntÃ©grÃ©</title>
+  <style>
+    /* Corps de page */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    /* Barre dâactions */
+    .toolbar { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+    .toolbar button { border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+    .toolbar button:hover { }
+
+    /* Grid principal */
+    .grid-container { display: flex; gap: 40px; }
+    /* Colonne gauche */
+    .form-left {
+      display: grid; grid-template-columns: 180px 1fr; row-gap: 10px; column-gap: 10px; flex: 1;
+    }
+    .form-left label { align-self: center; }
+    .form-left input { width: 33%; padding: 6px; box-sizing: border-box; }
+    /* Colonne droite */
+    .form-right {
+      display: grid; grid-template-columns: 180px 1fr; row-gap: 10px; column-gap: 10px; flex: 1; max-height: 33vh; align-items: center;
+    }
+    .form-right label { align-self: center; }
+    .form-right input, .form-right textarea { width: 33%; padding: 6px; box-sizing: border-box; height: 32px; }
+
+    /* Styles tables */
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #888; padding: 8px; text-align: left; }
+    th { }
+
+    /* Boutons + Ajouter */
+    .add-btn { border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin: 8px 0; display: inline-block; }
+
+    /* Total TTC */
+    .total-ttc { margin-top: 20px; font-weight: bold; font-size: 20px; }
+    .total-ttc input { width: 120px; margin-left: 10px; padding: 6px; box-sizing: border-box; font-size: 18px; }
+
+    /* === Suppression des ascenseurs sur les inputs number === */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body class="suppliers-body" class="suppliers-body">
+
+  <!-- Barre dâactions en haut -->
+  <div class="toolbar">
+    <button class="action-btn" onclick="location.href='/comptabilite_fournisseurs'">Retour</button>
+    <button class="action-btn" onclick="window.open('https://fr.wikipedia.org','_blank')">Aide</button>
+    <button class="action-btn" onclick="window.print()">Imprimer</button>
+    <button class="action-btn" id="btn-create" type="button">CrÃ©er</button>
+    <button class="action-btn" id="btn-update" type="button">MAJ</button>
+    <button class="action-btn" onclick="location.href='/liste_fournisseurs'">Liste</button>
+    <button class="action-btn" onclick="viderFormulaire()" type="button">Vider</button>
+  </div>
+
+  <!-- Le form unique -->
+  <form id="invoiceForm">
+
+    <!-- Deux colonnes pour les inputs -->
+    <div class="grid-container">
+      <!-- Colonne gauche (9 premiers inputs) -->
+      <div class="form-left">
+        <label for="fournisseur">Fournisseur :</label>
+        <input id="fournisseur" name="Fournisseur" type="text" list="liste_noms" autocomplete="off" placeholder="Tapez le fournisseurâ¦" />
+        <datalist id="liste_noms">
+          {% for f in df_fournisseurs %}
+            <option value="{{ f['Nom du fournisseur'] }}"></option>
+          {% endfor %}
+        </datalist>
+
+        <label for="num_compte_fournisseur">No compte Fournisseur :</label>
+        <input id="num_compte_fournisseur" name="No compte Fournisseur" type="text">
+
+        <label for="condition_paiement">Condition de paiement :</label>
+        <input id="condition_paiement" name="Condition de paiement" type="text">
+
+        <label for="date_facture">Date de facture :</label>
+        <input id="date_facture" name="Date de facture" type="date">
+
+        <label for="date_echeance">Date Ã©chÃ©ance :</label>
+        <input id="date_echeance" name="Date Ã©chÃ©ance" type="date">
+
+        <label for="date_paiement">Date paiement prÃ©vue :</label>
+        <input id="date_paiement" name="Date paiement prÃ©vue" type="date">
+
+        <label for="periode">PÃ©riode :</label>
+        <input id="periode" name="PÃ©riode" type="text">
+
+        <label for="montant">Montant :</label>
+        <input id="montant" name="Montant" type="text">
+
+        <label for="balance">Balance :</label>
+        <input id="balance" name="Balance" type="text">
+      </div>
+
+      <!-- Colonne droite (3 inputs restants) -->
+      <div class="form-right">
+        <label for="num_facture">No de facture :</label>
+        <input id="num_facture" name="No de facture" type="text">
+
+        <label for="num_commande">No de commande :</label>
+        <input id="num_commande" name="No de commande" type="text">
+
+        <label for="statut">Statut :</label>
+        <input id="statut" name="Statut" type="text">
+      </div>
+    </div>
+
+    <!-- Table des lignes facture -->
+
+<!-- ==== SECTION: TABLEAU ==== -->
+    <table id="invoice-table">
+      <thead>
+        <tr>
+          <th>No de compte</th>
+          <th>IntitulÃ© du compte</th>
+          <th>QuantitÃ©</th>
+          <th>UnitÃ©</th>
+          <th>Montant</th>
+          <th>Taux TVA</th>
+        </tr>
+      </thead>
+      <tbody id="invoice-body">
+        <tr>
+          <td><input name="compte[]"      type="text" /></td>
+          <td><input name="intitule[]"    type="text" /></td>
+          <td><input name="quantite[]"    type="number" step="1" inputmode="numeric" /></td>
+          <td><input name="unite[]"       type="number" step="1" inputmode="numeric" /></td>
+          <td><input name="montant[]"     type="number" step="0.01" inputmode="decimal" /></td>
+          <td><input name="tva[]"         type="number" step="0.01" inputmode="decimal" /></td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="action-btn" type="button" class="add-btn" id="add-line-invoice">+ Ajouter une ligne</button>
+
+    <!-- Table des lignes TVA -->
+
+<!-- ==== SECTION: TABLEAU ==== -->
+    <table id="tax-table">
+      <thead>
+        <tr>
+          <th>No de compte TVA</th>
+          <th>LibellÃ© Taxe</th>
+          <th>Taux de taxe</th>
+          <th>Montant des taxes</th>
+          <th>Taxe</th>
+        </tr>
+      </thead>
+      <tbody id="tax-body">
+        <tr>
+          <td><input name="compte_tva[]"   type="text" /></td>
+          <td><input name="libelle_taxe[]" type="text" /></td>
+          <td><input name="taux_taxe[]"    type="number" step="0.01" inputmode="decimal" /></td>
+          <td><input name="montant_taxe[]" type="number" step="0.01" inputmode="decimal" /></td>
+          <td><input name="taxe[]"         type="number" step="0.01" inputmode="decimal" /></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4" style="border:none;"></td>
+          <td class="total-ttc">Total TTC :</td>
+          <td><input id="total_ttc" name="total_ttc" readonly /></td>
+        </tr>
+      </tfoot>
+    </table>
+    <button class="action-btn" type="button" class="add-btn" id="add-line-tax">+ Ajouter une ligne</button>
+
+  </form>
+
+  <!-- Templates -->
+  <template id="tpl-invoice-line">
+    <tr>
+      <td><input name="compte[]"      type="text" /></td>
+      <td><input name="intitule[]"    type="text" /></td>
+      <td><input name="quantite[]"    type="number" step="1" inputmode="numeric" /></td>
+      <td><input name="unite[]"       type="number" step="1" inputmode="numeric" /></td>
+      <td><input name="montant[]"     type="number" step="0.01" inputmode="decimal" /></td>
+      <td><input name="tva[]"         type="number" step="0.01" inputmode="decimal" /></td>
+    </tr>
+  </template>
+
+  <template id="tpl-tax-line">
+    <tr>
+      <td><input name="compte_tva[]"   type="text" /></td>
+      <td><input name="libelle_taxe[]" type="text" /></td>
+      <td><input name="taux_taxe[]"    type="number" step="0.01" inputmode="decimal" /></td>
+      <td><input name="montant_taxe[]" type="number" step="0.01" inputmode="decimal" /></td>
+      <td><input name="taxe[]"         type="number" step="0.01" inputmode="decimal" /></td>
+    </tr>
+  </template>
+
+  <!-- ===== INJECTION CALCUL AUTOMATIQUE ===== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const invBody = document.getElementById('invoice-body');
+      const taxBody = document.getElementById('tax-body');
+      const totalEl = document.getElementById('total_ttc');
+
+      function recalcInvoiceRow(tr) {
+        const q = parseInt(tr.querySelector('[name="quantite[]"]').value, 10) || 0;
+        const u = parseInt(tr.querySelector('[name="unite[]"]').value, 10)    || 0;
+        tr.querySelector('[name="montant[]"]').value = (q * u).toFixed(2);
+      }
+
+      function recalcTotal() {
+        let sum = 0;
+        invBody.querySelectorAll('tr').forEach(tr => {
+          sum += parseFloat(tr.querySelector('[name="montant[]"]').value) || 0;
+        });
+        taxBody.querySelectorAll('tr').forEach(tr => {
+          sum += parseFloat(tr.querySelector('[name="montant_taxe[]"]').value) || 0;
+        });
+        totalEl.value = sum.toFixed(2);
+      }
+
+      invBody.addEventListener('input', e => {
+        if (e.target.matches('[name="quantite[]"], [name="unite[]"]')) {
+          recalcInvoiceRow(e.target.closest('tr'));
+          recalcTotal();
+        }
+      });
+      taxBody.addEventListener('input', e => {
+        if (e.target.matches('[name="montant_taxe[]"]')) {
+          recalcTotal();
+        }
+      });
+
+      document.getElementById('add-line-invoice')
+              .addEventListener('click', () => setTimeout(recalcTotal, 0));
+      document.getElementById('add-line-tax')
+              .addEventListener('click', () => setTimeout(recalcTotal, 0));
+
+      recalcTotal();
+    });
+  </script>
+  <!-- ===== FIN INJECTION ===== -->
+
+  <!-- === Votre script dâautoremplissage EXACTEMENT comme avant === -->
+  <script>
+    document.getElementById('fournisseur')
+      .addEventListener('input', async function() {
+        const v = this.value.trim();
+        if (!v) return;
+        const res = await fetch(
+          '/autocomplete?query='+encodeURIComponent(v)
+        );
+        if (!res.ok) return;
+        const arr = await res.json();
+        const f = arr.find(x => x['Nom du fournisseur']===v) || arr[0];
+        if (!f) return;
+        document.getElementById('num_compte_fournisseur').value = f['Compte Ã  crÃ©diter'];
+        document.getElementById('condition_paiement').value    = f['DÃ©lai de paiement'];
+        const invRow = document.querySelector('#invoice-body tr:last-child');
+        invRow.querySelector('[name="compte[]"]').value       = f['Compte Ã  dÃ©biter'];
+        invRow.querySelector('[name="tva[]"]').value          = f['Taux TVA 1'];
+        const taxRow = document.querySelector('#tax-body tr:last-child');
+        taxRow.querySelector('[name="compte_tva[]"]').value   = f['Compte TVA'];
+      });
+  </script>
+
+  <!-- === Votre JS de crÃ©ation / MAJ / vider === -->
+  <script>
+    // â¦ laissez ici exactement vos handlers Â«CrÃ©erÂ», Â«MAJÂ», Â«ViderÂ»â¦
+  </script>
+
+</body>
+</html>
+

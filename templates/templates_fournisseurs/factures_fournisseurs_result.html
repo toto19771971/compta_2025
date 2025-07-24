@@ -1,0 +1,231 @@
+<!-- templates_fournisseurs/factures_fournisseurs_result.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Résultats recherche factures</title>
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='style_fournisseurs.css') }}">
+
+  <style>
+
+
+/* Centre la barre d’actions et espace-la du haut de la fenêtre */
+.toolbar {
+  display: flex;
+  justify-content: center;    /* centré horizontalement */
+  margin-top: 2cm;           /* 2rem sous le bord supérieur */
+  margin-bottom: 1.5rem;      /* 1.5rem entre toolbar et titre */
+  gap: 2rem
+}
+
+/* Espace le titre de recherche du formulaire en dessous */
+h2 {
+  margin-top: 0;              /* pas d’espace inutile au-dessus */
+  margin-bottom: 1.5rem;      /* 1.5rem entre titre et formulaire */
+}
+    /* Conteneur du formulaire : centré, largeur limitée */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 1.5rem auto;
+}
+
+/* Deux colonnes côte à côte, chacune occupant 48% */
+form .fields {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  .left-fields,
+  .right-fields {
+    width: 48%;   /* 48% + 2rem de gap centré */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* Tous les inputs ET selects reprennent 100% de leur colonne,
+    mais la colonne elle-même est limitée à 48% */
+  .left-fields input,
+  .left-fields select,
+  .right-fields input,
+  .right-fields select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Si besoin de plafonner encore : */
+  .left-fields input,
+  .right-fields input {
+    max-width: 100%;  /* ne “dépasse” jamais sa colonne */
+  }
+
+  input, select {
+    padding: 6px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+
+
+
+  .results-table {
+      width: 90%;
+      max-width: 1000px;
+      margin: 1.5rem auto;  /* centre horizontalement */
+      border-collapse: collapse;
+    }
+
+  .results-table th,
+  .results-table td {
+      border: 1px solid #444;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+
+    /* Fond et style de l’en-tête */
+    .results-table thead {
+      background-color: #eee;
+    }
+
+    .results-table thead th {
+      font-weight: bold;
+    }
+
+    /* Lignes zebra pour la lisibilité */
+    .results-table tbody tr:nth-child(odd) {
+      background-color: #e81313;}
+    .results-table tbody tr:nth-child(even) {
+      background-color: #0edb30;  /* blanc */
+    }
+
+    .results-table {
+      width: 90vw !important;
+      max-width: none !important;
+      margin: 1.5rem auto !important;
+      display: table; /* pour garantir le comportement normal */
+    }
+
+    
+
+    
+  </style>
+  
+</head>
+<body class="suppliers-body">
+  <div class="container">
+    <!-- même barre d’actions que sur search -->
+    <nav class="toolbar">
+      <button class="action-btn" onclick="window.location.href='/factures_fournisseurs_search'">RECHERCHER</button>
+      <button class="action-btn" onclick="window.location.href='/factures_fournisseurs_ecriture'">CRÉER/ÉCRITURE</button>
+      <button class="action-btn" onclick="window.location.href='/comptabilite_fournisseurs'">RETOUR</button>
+    </nav>
+
+    <h2 style="text-align:center">1,1,1 RECHERCHE FOURNISSEUR</h2>
+
+    <!-- Reprise du formulaire (pré-rempli via {{ filters }}) -->
+    <form id="search-form"
+          action="{{ url_for('factures_fournisseurs_result') }}"
+          method="get">
+      <div class="fields">
+        <div class="left-fields">
+          <label>Code fournisseur :
+            <input type="text"
+                  name="code_fournisseur"
+                  id="code_fournisseur"
+                  value="{{ filters.code_fournisseur or '' }}">
+          </label>
+          <label>Fournisseur :
+            <input type="text"
+                  name="nom_fournisseur"
+                  id="nom_fournisseur"
+                  value="{{ filters.nom_fournisseur or '' }}">
+          </label>
+          <label>N° de PO :
+            <input type="text"
+                  name="po_number"
+                  value="{{ filters.po_number or '' }}">
+          </label>
+          <label>Paiement :
+            <select name="statut_paye">
+              <option value="non"      {{ 'selected' if filters.statut_paye=='non' }}>Non</option>
+              <option value="oui"      {{ 'selected' if filters.statut_paye=='oui' }}>Oui</option>
+              <option value="ensemble" {{ 'selected' if filters.statut_paye=='ensemble' }}>Ensemble</option>
+            </select>
+          </label>
+        </div>
+        <div class="right-fields">
+          <label>Date de facture : De
+            <input type="date"
+                  name="date_facture_de"
+                  value="{{ filters.date_facture_de or '' }}">
+          </label>
+          <label>à
+            <input type="date"
+                  name="date_facture_a"
+                  value="{{ filters.date_facture_a or '' }}">
+          </label>
+          <label>Date d’échéance : De
+            <input type="date"
+                  name="date_echeance_de"
+                  value="{{ filters.date_echeance_de or '' }}">
+          </label>
+          <label>à
+            <input type="date"
+                  name="date_echeance_a"
+                  value="{{ filters.date_echeance_a or '' }}">
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions" style="text-align:right; margin-top:2rem;">
+        <button type="submit" class="action-btn btn-primary">
+          RECHERCHER
+        </button>
+      </div>
+    </form>
+  </div>
+    <!-- Boucle sur factures -->
+    {% if factures %}
+      <h1>Résultats</h1>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>No de facture</th>
+            <th>Nom du fournisseur</th>
+            <th>Date de facture</th>
+            <th>Date d'échéance</th>
+            <th>Montant</th>
+            <th>Documents</th>
+            <th>Balance</th>
+            <th>Statut</th>
+            <th>Paiement</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in factures %}
+          <tr>
+            <td>{{ f['No de facture'] }}</td>
+            <td>{{ f['Nom du fournisseur'] }}</td>
+            <td>{{ f['Date de facture'] }}</td>
+            <td>{{ f["Date d'échéance"] }}</td>
+            <td>{{ '{:,.2f}'.format(f['Montant']) }}</td>
+            <td>{{ f['Documents'] }}</td>
+            <td>{{ f['Balance'] }}</td>
+            <td>{{ f['Statut'] }}</td>
+            <td>{{ f['Paiement'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p style="text-align:center">Aucun résultat pour ces critères.</p>
+    {% endif %}
+
+  
+</body>
+</html>

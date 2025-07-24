@@ -1,0 +1,57 @@
+<!-- ===== TEMPLATE ORGANISÉ (auto généré) ===== -->
+<!-- ===== TEMPLATE ORGANISÃ (auto gÃ©nÃ©rÃ©) ===== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="static/style_fournisseurs.css?v=3" type="text/css" />
+    <meta charset="UTF-8">
+    <title>Grand Livre</title>
+    <style>
+        body{font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:20px;}
+        table{width:100%;border-collapse:collapse;background:#fff;}
+        th,td{border:1px solid #4a90e2;padding:8px;font-size:0.95em;}
+        th{background:#e8f1fb;text-align:left;}
+        td:nth-child(7),td:nth-child(8){text-align:right;}
+    </style>
+</head>
+<body class="comptabilite" class="compta-body">
+    <h2>GrandÃÂ Livre</h2>
+
+<!-- ==== SECTION: TABLEAU ==== -->
+
+<!-- ==== SECTION: TABLEAU ==== -->
+    <table>
+        <thead>
+            <tr>
+                <th>NÃÂ° compte</th>
+                <th>PÃÂ©riode</th>
+                <th>Date</th>
+                <th>LibellÃÂ©</th>
+                <th>NumÃÂ©ro d'ÃÂ©criture</th>
+                <th>Fournisseur</th>
+                <th>DÃÂ©bit</th>
+                <th>CrÃÂ©dit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in entries %}
+            <tr>
+                <td>{{ e.num_compte }}</td>
+                <td>{{ e.periode }}</td>
+                <td>{{ e.date }}</td>
+                <td>{{ e.libelle }}</td>
+                <td>
+                    <a href="{{ url_for('grand_livre_ecriture_id', num_ecriture=e.num_ecriture) }}">
+                        {{ e.num_ecriture }}
+                    </a>
+                </td>
+                <td>{{ e.fournisseur }}</td>
+                <td>{{ '%.2f'|format(e.debit|float) }}</td>
+                <td>{{ '%.2f'|format(e.credit|float) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
+

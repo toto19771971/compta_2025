@@ -1,0 +1,84 @@
+/* static/style_fournisseurs.css */
+
+/* 1) Fond général des pages fournisseurs */
+.suppliers-body {
+  background-color: #a49785; /* couleur de fond */
+}
+
+/* 2) Toolbar (barre en haut) */
+.toolbar button,
+.toolbar a {
+  background-color: #5641a6;      /* fond navbar */
+  border: 2px solid #382661;      /* bordure navbar */
+  border-color: #382661;          /* explicitement */
+  color: #ffffff;                 /* texte navbar */
+  padding: 10px 20px;             /* zone cliquable */
+  border-radius: 4px;             /* arrondi */
+  text-decoration: none;          /* supprime soulignement */
+  cursor: pointer;                /* pointeur au survol */
+}
+.toolbar button:hover,
+.toolbar a:hover {
+  background-color: #382661;      /* hover navbar */
+  border-color:    #5641a6;       /* bordure hover */
+}
+/* 3) Mise en forme toolbar hors couleur */
+.toolbar {
+  all: unset !important; 
+  margin-top: 1cm !important; /*(le haut et le bas) */
+  margin-bottom: 1cm !important;
+  display: flex !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  gap: 1rem !important;
+}
+
+.toolbar {
+  padding: 0.75rem 1.5rem;   /* vertical 12px, horizontal 24px */
+  font-size: 1rem;           /* 16px */
+  border-radius: 0.5rem;     /* coins arrondis */
+  cursor: pointer;
+}
+
+
+
+/* 3) Boutons d’action (submit, add, vider…) */
+.action-btn,
+button.action-btn,
+input[type="submit"].action-btn {
+  background-color: #8c3b3b;      /* fond actions */
+  border: 2px solid #5f2929;      /* bordure actions */
+  border-color: #5f2929;          /* explicitement */
+  color: #ffffff;                 /* texte actions */
+  padding: 8px 16px;              /* zone cliquable */
+  border-radius: 4px;             /* arrondi */
+  cursor: pointer;                /* pointeur au survol */
+  display: inline-block;          /* boîte propre */
+  text-align: center;             /* centre texte */
+}
+.action-btn:hover,
+button.action-btn:hover,
+input[type="submit"].action-btn:hover {
+  background-color: #5f2929;      /* hover actions */
+  border-color:    #8c3b3b;       /* bordure hover */
+}
+
+/* 4) Nettoyage des styles inline */
+form *[style],
+table *[style] {
+  background: none !important;
+  color: inherit  !important;
+  border: none   !important;
+}
+
+
+
+
+
+/* --- Forcer les boutons de la toolbar à reprendre leur style navbar même s’ils ont .action-btn --- */
+.toolbar button.action-btn,
+.toolbar a.action-btn {
+  background-color: #5641a6 !important;   /* fond navbar */
+  border: 2px solid #382661 !important;   /* bordure navbar */
+}
+

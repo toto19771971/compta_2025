@@ -1,0 +1,45 @@
+<!-- ===== TEMPLATE ORGANISÉ (auto généré) ===== -->
+<!-- ===== TEMPLATE ORGANISÃ (auto gÃ©nÃ©rÃ©) ===== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="static/style_fournisseurs.css?v=3" type="text/css" />
+    <meta charset="UTF-8">
+    <title>PP / Bilan</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background: #f0f0f0; }
+        .subtotal { font-weight: bold; background: #def; }
+        .total { font-weight: bold; background: #9df; font-size: 1.1em; }
+        .cat-header td { background: #eef; font-weight: bold; }
+    </style>
+</head>
+<body class="comptabilite" class="compta-body">
+    <h2>PP / Bilan Ã¢ÂÂ RÃÂ©sultat</h2>
+
+<!-- ==== SECTION: TABLEAU ==== -->
+
+<!-- ==== SECTION: TABLEAU ==== -->
+    <table>
+        <tr><th>NÃÂ° Compte</th><th>Description</th><th>Montant</th></tr>
+        {% for ligne in lignes %}
+            {% if ligne.type == 'header' %}
+                <tr class="cat-header"><td colspan="3">{{ ligne.CatÃÂ©gorie }}</td></tr>
+            {% elif ligne.type == 'compte' %}
+                <tr>
+                    <td>{{ ligne['NÃÂ° compte'] }}</td>
+                    <td>{{ ligne.IntitulÃÂ© }}</td>
+                    <td style="text-align:right">{{ "%.2f"|format(ligne.Montant) }}</td>
+                </tr>
+            {% elif ligne.type == 'subtotal' %}
+                <tr class="subtotal"><td colspan="2">Sous-total</td><td style="text-align:right">{{ "%.2f"|format(ligne.Montant) }}</td></tr>
+            {% elif ligne.type == 'total' %}
+                <tr class="total"><td colspan="2">TOTAL GÃÂNÃÂRAL</td><td style="text-align:right">{{ "%.2f"|format(ligne.Montant) }}</td></tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+</body>
+</html>
+

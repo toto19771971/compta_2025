@@ -1,0 +1,261 @@
+<!-- ===== TEMPLATE ORGANISÉ (auto généré) ===== -->
+<!-- DUPLIQUÉS de <table>: 2 occurrences ===== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="static/style_fournisseurs.css?v=3" type="text/css" />
+  <meta charset="UTF-8">
+  <title>Wireframe - Nouvelle Facture Client</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: linear-gradient(45deg, #ffcccc, #ff6666) !important;
+    }
+    .header {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .header button {
+      background-color: #08519a;
+      color: #ffffff;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+    .header button:hover {
+      background-color: #0056b3;
+    }
+    .form-container {
+      display: flex;
+      justify-content: flex-start;
+      align-items: start;
+      gap: 40px;
+    }
+    form {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      row-gap: 10px;
+      column-gap: 10px;
+      max-width: 500px;
+    }
+    .right-group {
+      display: grid;
+      grid-template-columns: 150px 250px;
+      row-gap: 10px;
+      column-gap: 10px;
+      width: 400px;
+    }
+    form input, form select, form textarea {
+      width: 100%;
+      padding: 4px;
+      box-sizing: border-box;
+    }
+    .right-group input, .right-group select, .right-group textarea {
+      width: 250px;
+      padding: 4px;
+      box-sizing: border-box;
+    }
+    .right-group textarea {
+      height: 100px;
+      resize: vertical;
+    }
+    label {
+      align-self: center;
+      margin-right: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+    th, td {
+      border: 1px solid #888;
+      padding: 6px;
+      text-align: left;
+    }
+    th {
+      background: #ddd;
+    }
+    td input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 4px;
+    }
+    .add-btn {
+      background: #0056b3;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 8px 0;
+      display: inline-block;
+    }
+    .spacer {
+      height: 20px;
+      background: #fff;
+      margin: 0;
+    }
+    .total-ttc {
+      margin-top: 20px;
+      font-weight: bold;
+      color: red;
+      text-align: right;
+      font-size: 20px;
+    }
+    .total-ttc input {
+      width: 120px;
+      height: 40px;
+      margin-left: 10px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body class="clients" class="clients-body">
+
+  <div class="header">
+    <button class="action-btn" onclick="window.location.href='/comptabilite_clients'">Retour</button>
+    <button class="action-btn" onclick="window.open('https://fr.wikipedia.org', '_blank')">Aide</button>
+    <button class="action-btn" onclick="window.print()">Imprimer</button>
+    <button class="action-btn" disabled>Ajouter</button>
+    <button class="action-btn" disabled>Mettre Ã  jour</button>
+  </div>
+
+  <h1>Nouvelle Facture Client</h1>
+
+  <div class="form-container">
+    <form>
+      <label for="client">Client :</label>
+      <input id="client" type="text" placeholder="">
+      <label for="num_compte_client">No compte Client :</label>
+      <input id="num_compte_client" type="text" placeholder="">
+      <label for="condition_paiement">Condition de paiement :</label>
+      <input id="condition_paiement" type="text" placeholder="">
+      <label for="date_facture">Date de facture :</label>
+      <input id="date_facture" type="date">
+      <label for="date_echeance">Date Ã©chÃ©ance :</label>
+      <input id="date_echeance" type="date">
+      <label for="date_paiement">Date paiement prÃ©vue :</label>
+      <input id="date_paiement" type="date">
+      <label for="periode">PÃ©riode :</label>
+      <input id="periode" type="text" placeholder="">
+      <label for="montant">Montant :</label>
+      <input id="montant" type="text" placeholder="">
+      <label for="balance">Balance :</label>
+      <input id="balance" type="text" placeholder="">
+    </form>
+    <div class="right-group">
+      <label for="num_facture">No de facture :</label>
+      <input id="num_facture" type="text" placeholder="">
+      <label for="num_commande">No de commande :</label>
+      <input id="num_commande" type="text" placeholder="">
+      <label for="statut">Statut :</label>
+      <input id="statut" type="text" placeholder="">
+    </div>
+  </div>
+
+  <!-- Tableau Lignes Facture -->
+
+<!-- ==== SECTION: TABLEAU ==== -->
+  <table id="invoice-table">
+    <thead>
+      <tr>
+        <th>No de compte</th>
+        <th>IntitulÃ© du compte</th>
+        <th>QuantitÃ©</th>
+        <th>UnitÃ©</th>
+        <th>Montant</th>
+        <th>Taux TVA</th>
+      </tr>
+    </thead>
+    <tbody id="invoice-body">
+      <tr>
+        <td><input name="compte[]" /></td>
+        <td><input name="intitule[]" /></td>
+        <td><input name="quantite[]" type="number" /></td>
+        <td><input name="unite[]" /></td>
+        <td><input name="montant[]" /></td>
+        <td><input name="tva[]" /></td>
+      </tr>
+    </tbody>
+  </table>
+  <button class="action-btn" id="add-invoice" class="add-btn">+ Ajouter une ligne</button>
+
+  <!-- Spacer blanc -->
+  <div class="spacer"></div>
+
+  <!-- Tableau Lignes TVA -->
+
+<!-- ==== SECTION: TABLEAU ==== -->
+  <table id="tax-table">
+    <thead>
+      <tr>
+        <th>No de compte TVA</th>
+        <th>LibellÃ© Taxe</th>
+        <th>Taux de taxe</th>
+        <th>Montant des taxes</th>
+        <th>Taxe</th>
+      </tr>
+    </thead>
+    <tbody id="tax-body">
+      <tr>
+        <td><input name="compte_tva[]" /></td>
+        <td><input name="libelle_taxe[]" /></td>
+        <td><input name="taux_taxe[]" /></td>
+        <td><input name="montant_taxe[]" /></td>
+        <td><input name="taxe[]" /></td>
+      </tr>
+    </tbody>
+  </table>
+  <button class="action-btn" id="add-tax" class="add-btn">+ Ajouter une ligne</button>
+
+  <!-- Total TTC -->
+  <div class="total-ttc">
+    Total TTC : <input type="text" name="total_ttc" />
+  </div>
+
+  <template id="tpl-invoice-line">
+    <tr>
+      <td><input name="compte[]" /></td>
+      <td><input name="intitule[]" /></td>
+      <td><input name="quantite[]" type="number" /></td>
+      <td><input name="unite[]" /></td>
+      <td><input name="montant[]" /></td>
+      <td><input name="tva[]" /></td>
+    </tr>
+  </template>
+
+  <template id="tpl-tax-line">
+    <tr>
+      <td><input name="compte_tva[]" /></td>
+      <td><input name="libelle_taxe[]" /></td>
+      <td><input name="taux_taxe[]" /></td>
+      <td><input name="montant_taxe[]" /></td>
+      <td><input name="taxe[]" /></td>
+    </tr>
+  </template>
+
+  <script>
+    const invBody = document.getElementById('invoice-body');
+    const taxBody = document.getElementById('tax-body');
+    const tplInv  = document.getElementById('tpl-invoice-line').content;
+    const tplTax  = document.getElementById('tpl-tax-line').content;
+
+    document.getElementById('add-invoice').onclick = () => {
+      invBody.appendChild(document.importNode(tplInv, true));
+    };
+    document.getElementById('add-tax').onclick = () => {
+      taxBody.appendChild(document.importNode(tplTax, true));
+    };
+  </script>
+
+</body>
+</html>
+

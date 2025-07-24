@@ -1,0 +1,32 @@
+/* static/style_administration.css */
+:root {
+  --module-bg:   #e0f7fa;  
+  --btn-bg:      #006064;  
+  --btn-border:  #004d40;  
+}
+body.administration {
+  background: var(--module-bg) !important;
+}
+body.administration .toolbar button,
+body.administration .toolbar a {
+  background: var(--btn-bg) !important;
+  border:     2px solid var(--btn-border) !important;
+  color:      #fff !important;
+}
+body.administration .toolbar button:hover,
+body.administration .toolbar a:hover {
+  background: var(--btn-border) !important;
+}
+body.administration .btn-action {
+  background: var(--btn-bg) !important;
+  border:     2px solid var(--btn-border) !important;
+  color:      #fff !important;
+}
+body.administration .btn-action:hover {
+  background: var(--btn-border) !important;
+}
+body.administration form *[style],
+body.administration table *[style] {
+  background: none      !important;
+  color:      inherit   !important;
+}

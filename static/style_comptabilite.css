@@ -1,0 +1,41 @@
+/* static/style_comptabilite.css */
+/* 1) Variables CSS : trois couleurs centrales */
+:root {
+  --module-bg:   #f0f4f8;  /* fond pages comptabilité */
+  --btn-bg:      #3c6e71;  /* fond boutons */
+  --btn-border:  #284b50;  /* bordures et hover */
+}
+
+/* 2) Fond général des pages */
+body.comptabilite {
+  background: var(--module-bg) !important;
+}
+
+/* 3) Boutons de navbar (.toolbar) */
+body.comptabilite .toolbar button,
+body.comptabilite .toolbar a {
+  background: var(--btn-bg) !important;
+  border:     2px solid var(--btn-border) !important;
+  color:      #fff !important;
+}
+body.comptabilite .toolbar button:hover,
+body.comptabilite .toolbar a:hover {
+  background: var(--btn-border) !important;
+}
+
+/* 4) Boutons d’action (.btn-action) */
+body.comptabilite .btn-action {
+  background: var(--btn-bg) !important;
+  border:     2px solid var(--btn-border) !important;
+  color:      #fff !important;
+}
+body.comptabilite .btn-action:hover {
+  background: var(--btn-border) !important;
+}
+
+/* 5) Nettoyage des styles inline restants */
+body.comptabilite form *[style],
+body.comptabilite table *[style] {
+  background: none      !important;
+  color:      inherit   !important;
+}

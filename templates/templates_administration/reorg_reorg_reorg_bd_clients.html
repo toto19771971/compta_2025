@@ -1,0 +1,45 @@
+<!-- ===== TEMPLATE ORGANISÉ (auto généré) ===== -->
+<!-- ===== TEMPLATE ORGANISÃ (auto gÃ©nÃ©rÃ©) ===== -->
+<!-- ===== TEMPLATE ORGANISÃÂ (auto gÃÂ©nÃÂ©rÃÂ©) ===== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="static/style_fournisseurs.css?v=3" type="text/css" />
+  <meta charset="UTF-8">
+  <title>BD Clients</title>
+  <style>
+    body { font-family: Arial; padding:20px; }
+    .toolbar { margin-bottom:15px; }
+    .toolbar .btn, .toolbar button { margin-right:10px; font-size:14px; padding:6px 12px; border:1px solid #007bff; background:#fff; color:#007bff; border-radius:4px; cursor:pointer; text-decoration:none; }
+    .toolbar .btn:hover, .toolbar button:hover { background:#007bff; color:#fff; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+    th { background:#eee; }
+  </style>
+</head>
+<body class="administration" class="admin-body">
+  <div class="toolbar">
+    <a href="{{ url_for('administration') }}" class="btn">ÃÂ¢ÃÂÃÂ Administration</a>
+    <button class="action-btn" onclick="window.print()">ÃÂ°ÃÂÃÂÃÂ¨ Imprimer</button>
+    <a href="{{ url_for(request.endpoint) }}?export=1" class="btn">ÃÂ¢ÃÂ¬ÃÂ TÃÂÃÂ©lÃÂÃÂ©charger (.xlsx)</a>
+  </div>
+  <h1>BD Clients</h1>
+
+<!-- ==== SECTION: TABLEAU ==== -->
+
+<!-- ==== SECTION: TABLEAU ==== -->
+
+<!-- ==== SECTION: TABLEAU ==== -->
+  <table>
+    <thead>
+      <tr>{% for col in columns %}<th>{{ col }}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>{% for col in columns %}<td>{{ row[col] }}</td>{% endfor %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
+

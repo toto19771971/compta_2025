@@ -1,0 +1,183 @@
+<!-- ===== TEMPLATE ORGANISÉ (auto généré) ===== -->
+<!-- DUPLIQUÉS de <table>: 2 occurrences ===== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="static/style_fournisseurs.css?v=3" type="text/css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle Ã©criture manuelle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_principal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_journal.css') }}">
+    <style>
+        .top-actions { text-align: center; margin: 20px 0; }
+        .top-actions a { margin: 0 10px; padding: 10px 20px; background: #ccffcc; color: #0e130e; text-decoration: none; font-weight: bold; border-radius: 8px; }
+        .container { background: white; width: 95%; margin: 0 auto; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { font-size: 1.5em; margin-bottom: 20px; }
+        .form-section { margin-bottom: 30px; }
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        /* aligne PÃ©riode et LibellÃ© sous Date */
+       
+        .form-group { display: flex; align-items: center; }
+        .form-group label { width: 180px; font-weight: bold; }
+        .form-group input[type=date],
+        .form-group input[type=month],{ flex: 0 0 150px; max-width: 150px; padding: 8px; font-size: 1em; border: 1px solid #ccc; border-radius: 4px; }
+        .form-group input[type=text] { flex: 0 0 150px; max-width: 300px; padding: 8px; font-size: 1em; border: 1px solid #ccc; border-radius: 4px; }
+        .form-group-right { display: flex; align-items: center; }
+        .form-group-right label { width: auto; margin-right: 8px; font-weight: bold; }
+        .form-group-right select { flex: 0 0 100px; max-width: 100px; padding: 8px; background: #ccffcc; color: #0e130e; border: 1px solid #ccc; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #4a90e2; padding: 8px; font-size: 0.95em; }
+        th { background: #e8f1fb; text-align: left; }
+        .accounts-col select { width: 100%; padding: 6px; }
+        .add-row { display: inline-block; margin-top: 10px; padding: 8px 12px; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .total-row td { font-weight: bold; }
+
+        /* aligne les inputs PÃ©riode et LibellÃ© sous lâinput Date */
+        .row:nth-of-type(2) .form-group,
+        .row:nth-of-type(3) .form-group {
+        margin-left: 188px; /* 180px pour le label + ~8px dâespacement */
+
+        /* Aligne DÃ©bit, CrÃ©dit et Totaux Ã  droite */
+        #ecritures_table td:nth-child(3),
+        #ecritures_table td:nth-child(4),
+        .total-row td:nth-child(3),
+        .total-row td:nth-child(4) {
+         text-align: right;
+
+         /* Aligne les montants Ã  droite */
+#ecritures_table td:nth-child(3),
+#ecritures_table td:nth-child(4),
+#ecritures_table tfoot td:nth-child(3),
+#ecritures_table tfoot td:nth-child(4) {
+  text-align: right;
+}
+
+/* Retire les bordures et fonds des inputs montants */
+#ecritures_table input[type="text"] {
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: right;
+}
+
+/* 1) tableau fixe et colonnes Ã  largeur dÃ©finie */
+#ecritures_table, #total_table {
+  table-layout: fixed;
+}
+
+/* 2) chiffres dÃ©bit/crÃ©dit et totaux Ã  droite */
+#ecritures_table td:nth-child(3),
+#ecritures_table td:nth-child(4),
+#total_table td:nth-child(3),
+#total_table td:nth-child(4) {
+  text-align: right;
+}
+
+/* 3) enlever le cadre des inputs et les aligner Ã  droite */
+#ecritures_table input[type="text"] {
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: right;
+}
+
+}
+
+    </style>
+</head>
+<body class="comptabilite" class="compta-body">
+    <div class="top-actions">
+        <a href="#">RETOUR</a>
+        <a href="#">AIDE</a>
+        <a href="#">IMPRIMER</a>
+        <a href="#">CRÃER</a>
+        <a href="#">SUPPRIMER</a>
+        <a href="#">TELECHARGER EN PDF</a>
+        <a href="#">LOGO</a>
+    </div>
+    <div class="container">
+        <h1>Nouvelle Ã©criture manuelle au journal</h1>
+
+<!-- ==== SECTION: FORMULAIRE ==== -->
+        <form method="post">
+            <!-- MÃ©tadonnÃ©es avec MÃ©moriser alignÃ© -->
+            <div class="form-section">
+                <div class="row">
+                    <div class="form-group">
+                        <label for="date_comptabilisation">Date de comptabilisation :</label>
+                        <input type="date" id="date_comptabilisation" name="date_comptabilisation" placeholder="JJ/MM/AA">
+                    </div>
+                    <div class="form-group-right">
+                        <label for="memoriser_choice">MÃ©moriser :</label>
+                        <select id="memoriser_choice" name="memoriser_choice">
+                            <option value="non" selected>Non</option>
+                            <option value="oui">Oui</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="periode">PÃ©riode :</label>
+                        <input type="month" id="periode" name="periode" placeholder="MM/AA">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="libelle">LibellÃ© :</label>
+                        <input type="text" id="libelle" name="libelle" placeholder="Texte libre">
+                    </div>
+                </div>
+            </div>
+            <!-- Lignes d'Ã©criture -->
+            <div class="form-section">
+
+<!-- ==== SECTION: TABLEAU ==== -->
+                <table id="ecritures_table">
+                    <thead>
+                        <tr>
+                            <th>No de compte</th>
+                            <th>IntitulÃ© du compte</th>
+                            <th>Montant DÃ©bit</th>
+                            <th>Montant CrÃ©dit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="accounts-col"><select name="compte[]"><option value="">_SÃ©lectionner_</option></select></td>
+                            <td></td>
+                            <td><input type="text" name="debit[]" placeholder="0,00"></td>
+                            <td><input type="text" name="credit[]" placeholder="0,00"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="add-row" onclick="addRow()">Ajouter +</div>
+            </div>
+            <!-- Totaux -->
+
+<!-- ==== SECTION: TABLEAU ==== -->
+            <table style="margin-top: 10px; width: 100%;">
+                <tr class="total-row">
+                    <td colspan="2">Total</td>
+                    <td id="total_debit">0,00</td>
+                    <td id="total_credit">0,00</td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <script>
+        function addRow() {
+            const tbody = document.querySelector('#ecritures_table tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="accounts-col"><select name="compte[]"><option value="">_SÃ©lectionner_</option></select></td>
+                <td></td>
+                <td><input type="text" name="debit[]" placeholder="0,00"></td>
+                <td><input type="text" name="credit[]" placeholder="0,00"></td>
+            `;
+            tbody.appendChild(row);
+        }
+    </script>
+</body>
+</html>
+

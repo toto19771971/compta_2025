@@ -1,0 +1,121 @@
+
+
+
+
+:root {
+  --panel-bg:   #ffffff;         /* couleur contrastante  du petit contenaire central des boutons*/
+  --panel-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Conteneur de type “panel” */
+.panel {
+  background: var(--panel-bg) !important;
+  box-shadow: var(--panel-shadow) !important;
+  
+}
+
+.container .button-container {
+  background: var(--panel-bg)     !important;
+  box-shadow: var(--panel-shadow) !important;
+}
+
+
+/* Appliquer l’effet panel à chaque container des pages fournisseurs */
+.container {
+  background: var(--panel-bg)     !important;
+  box-shadow: var(--panel-shadow) !important;
+}
+
+
+:root {
+  --module-bg:     #9ea5b1;  /* arrière-plan des pages */
+  --btn-bg:        #66729f;  /* couleur de fond des boutons */
+  --btn-border:    #c57f78;  /* couleur des bordures des boutons */
+}
+
+/* Application des couleurs */
+body, .container {
+  background: var(--module-bg) !important;
+}
+
+.btn, .btn-primary, .toolbar button, .toolbar a {
+  background: var(--btn-bg)     !important;
+  border:     2px solid var(--btn-border) !important;
+}
+
+.btn:hover, .btn-primary:hover,
+.toolbar button:hover, .toolbar a:hover {
+  background: var(--btn-border) !important;
+}
+
+/* Supprimer tout style inline form/table */
+form *[style], table *[style] {
+  background: none !important;
+  color: inherit !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* style_principal.css : mise en page commune, sans couleurs */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Effet d'ombre */
+}
+
+.logo {
+  width: 300px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  /* color retiré */
+}
+
+.button-container {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
+
+.custom-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px 60px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 20px;
+  /* background-color, border, color retirés */
+  transition: background-color 0.3s, border-color 0.3s;
+  width: 400px;
+}
+
+.custom-button:hover {
+  /* background-color, border-color retirés */
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+

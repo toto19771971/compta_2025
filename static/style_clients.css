@@ -1,0 +1,32 @@
+/* static/style_clients.css */
+:root {
+  --module-bg:   #fff8e1;  
+  --btn-bg:      #f9a825;  
+  --btn-border:  #c17900;  
+}
+body.clients {
+  background: var(--module-bg) !important;
+}
+body.clients .toolbar button,
+body.clients .toolbar a {
+  background: var(--btn-bg) !important;
+  border:     2px solid var(--btn-border) !important;
+  color:      #fff !important;
+}
+body.clients .toolbar button:hover,
+body.clients .toolbar a:hover {
+  background: var(--btn-border) !important;
+}
+body.clients .btn-action {
+  background: var(--btn-bg) !important;
+  border:     2px solid var(--btn-border) !important;
+  color:      #fff !important;
+}
+body.clients .btn-action:hover {
+  background: var(--btn-border) !important;
+}
+body.clients form *[style],
+body.clients table *[style] {
+  background: none      !important;
+  color:      inherit   !important;
+}

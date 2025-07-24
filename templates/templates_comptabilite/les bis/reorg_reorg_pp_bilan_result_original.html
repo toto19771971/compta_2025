@@ -1,0 +1,63 @@
+<!-- ===== TEMPLATE ORGANISÉ (auto généré) ===== -->
+<!-- ===== TEMPLATE ORGANISÃ (auto gÃ©nÃ©rÃ©) ===== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="static/style_fournisseurs.css?v=3" type="text/css" />
+    <meta charset="UTF-8">
+    <title>RÃÂ©sultat P&P / Bilan</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 30px; }
+        h2 { text-align: center; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background-color: #e0e0e0; text-align: left; }
+        td { text-align: right; }
+        td.label { text-align: left; }
+        tr.group-total { background-color: #d0f0d0; font-weight: bold; }
+        tr.final-total { background-color: #a4e4a4; font-weight: bold; font-size: 1.1em; }
+    </style>
+</head>
+<body class="comptabilite" class="compta-body">
+
+<h2>{{ nom_entreprise }} Ã¢ÂÂ P&P / Bilan</h2>
+
+<!-- ==== SECTION: TABLEAU ==== -->
+
+<!-- ==== SECTION: TABLEAU ==== -->
+<table>
+    <thead>
+        <tr>
+            <th>NÃÂ° compte</th>
+            <th>IntitulÃÂ© du compte</th>
+            <th>Montant</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ligne in lignes %}
+            {% if ligne.type == "categorie" %}
+                <tr><td colspan="3"><strong>{{ ligne.valeur }}</strong></td></tr>
+            {% elif ligne.type == "ligne" %}
+                <tr>
+                    <td class="label">{{ ligne.compte }}</td>
+                    <td class="label">{{ ligne.intitule }}</td>
+                    <td>{{ "%.2f"|format(ligne.montant) }}</td>
+                </tr>
+            {% elif ligne.type == "sous_total" %}
+                <tr class="group-total">
+                    <td colspan="2">{{ ligne.valeur }}</td>
+                    <td>{{ "%.2f"|format(ligne.montant) }}</td>
+                </tr>
+            {% elif ligne.type == "total_general" %}
+                <tr class="final-total">
+                    <td colspan="2">{{ ligne.valeur }}</td>
+                    <td>{{ "%.2f"|format(ligne.montant) }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>
+

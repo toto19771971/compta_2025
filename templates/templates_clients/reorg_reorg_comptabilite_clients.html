@@ -1,0 +1,37 @@
+<!-- ===== TEMPLATE ORGANISÉ (auto généré) ===== -->
+<!-- ===== TEMPLATE ORGANISÃ (auto gÃ©nÃ©rÃ©) ===== -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="static/style_fournisseurs.css?v=3" type="text/css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComptabilitÃÂ© clients</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_principal.css') }}"> <!-- Dans votre template, incluez d'abord style_principal.css, puis style_clients.css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_clients.css') }}">
+    <style>
+    .container { background-color: #f0fff0 !important; }
+    </style>    
+    
+</head>
+<body class="clients" class="clients-body">
+    <div class="container">
+        <h1>ComptabilitÃÂ© clients</h1>
+        <div class="button-container">
+                <a href="{{ url_for('recherche_factures_clients') }}" class="custom-button">
+                    Factures clients et notes de crÃÂ©dit
+                </a>
+                <a href="{{ url_for('recherche_clients') }}" class="custom-button">
+                    Liste des clients
+                </a>
+                <a href="#" class="custom-button">
+                    Paiements en attente
+                </a>
+                <a href="#" class="custom-button">
+                     Factures clients mÃÂ©morisÃÂ©es
+                </a>
+        </div>
+    </div>
+</body>
+</html>
+

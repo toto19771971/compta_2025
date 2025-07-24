@@ -1,0 +1,187 @@
+<!-- ===== TEMPLATE ORGANISÉ (auto généré) ===== -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="static/style_comptabilite.css?v=3" type="text/css" />
+    <meta charset="UTF-8">
+    <title>RÃ©sultat Bilan multi-pÃ©riodes</title>
+    <style>
+        .top-buttons {
+        display: flex;
+        justify-content: center;      /* CENTRER LES BOUTONS */
+        gap: 20px;
+        padding: 20px;
+        background-color: #f5f5f5;
+        }
+
+        .top-buttons button {
+        background-color: #ccffcc;
+        border: 2px solid #66cc66;
+        color: #000;
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        }
+
+        .top-buttons button:hover {
+        background-color: #b3e6b3;
+        }
+
+    .container {
+      max-width: 95%;
+      margin: 40px auto;
+      padding: 0 10px;
+    }
+    .top-buttons, h2 {
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      margin: 20px auto;    /* centre et espace */
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: right;
+    }
+    th:nth-child(1), td:nth-child(1),
+    th:nth-child(2), td:nth-child(2) {
+      text-align: left;
+    }
+  
+        .results-table {
+            margin: 0 auto;              /* CENTRER LE TABLEAU */
+            width: 95%;                  /* Ajustez si nÃ©cessaire */
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table th,
+        .results-table td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: right;
+        }
+
+        .results-table th:nth-child(1),
+        .results-table td:nth-child(1) {
+            text-align: left;
+            width: 100px;
+        }
+        .results-table th:nth-child(2),
+        .results-table td:nth-child(2) {
+            text-align: left;
+            width: 200px;
+        }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: right; }
+        th:nth-child(1), td:nth-child(1) { text-align: left; width: 100px; }
+        th:nth-child(2), td:nth-child(2) { text-align: left; width: 200px; }
+        tr.class-level { background-color: #e1f0ff; font-weight: bold; }
+        tr.group-level { background-color: #f7f7f7; font-weight: bold; }
+        tr.sous_groupe-level { background-color: #f0f0f0; font-weight: bold; }
+        tr.indent-3 { padding-left: 60px; }
+
+        tr.class-level { background-color: #e1f0ff; font-weight: bold; }
+        tr.group-level { background-color: #f7f7f7; font-weight: bold; }
+        tr.sous_groupe-level { background-color: #f0f0f0; font-weight: bold; }
+        tr.indent-3 td:nth-child(2) { padding-left: 40px; font-style: italic; }
+
+        tr.total-general {
+        background-color: #e8e8e8;
+        font-weight: bold;
+        color: black;
+        }
+
+                /* Style pour toutes les lignes "niveau" et "sous-total" */
+        .classe-level,
+        .groupe-level,
+        .sous_groupe-level,
+        .classe-subtotal,
+        .groupe-subtotal,
+        .sous_groupe-subtotal {
+            background-color: rgba(200, 200, 200, 0.3);  /* lÃ©ger gris homogÃ¨ne */
+            font-weight: bold;
+        }
+
+        /* Style pour la ligne TOTAL GÃ©nÃ©ral */
+        .total-general {
+            background-color: #999;
+            color: #fff;
+            font-size: 1.1em;
+        }
+
+        /* Aligne Ã  droite le seul montant de la ligne TOTAL GÃ©nÃ©ral */
+        tr.total-general td:last-child {
+        text-align: right !important;
+        }
+
+    </style>
+
+</head>
+<body class="comptabilite" class="compta-body">
+
+    <div class="top-buttons">
+       <button class="action-btn" onclick="window.location.href='pp_bilan_search'">RETOUR</button>
+        <button class="action-btn" id="btn-aide">AIDE</button>
+        <button class="action-btn" id="btn-Imprimer">Imprimer</button>
+        <button class="action-btn" id="btn-telecharger">TÃLÃCHARGER EN PDF</button>
+    </div>
+
+    <h2>RÃ©sultat {{ type_etat }} de {{ periode_de }} Ã  {{ periode_a }}</h2>
+
+<!-- ==== SECTION: TABLEAU ==== -->
+    <table>
+        <thead>
+            <tr>
+                <th>Compte</th>
+                <th>Description</th>
+                {% for periode in periodes %}
+                    <th>{{ periode }}</th>
+                {% endfor %}
+                
+                 {% if total_annuel %}<th>Total annuel</th>{% else %}<th>Total</th>{% endif %}
+   
+            </tr>
+        </thead>
+        <tbody>
+            {# âââ Boucle sur toutes les lignes sauf le total-general âââ #}
+            {% for ligne in lignes if ligne.niveau != 'total-general' %}
+                <tr class="{{ ligne.niveau }}">
+                <td>{{ ligne.compte }}</td>
+                <td{% if 'indent' in ligne.niveau %} style="padding-left:60px"{% endif %}>
+                    {{ ligne.description }}
+                </td>
+                {% for montant in ligne.montants %}
+                    <td>{{ "{:,.2f}".format(montant).replace(",", " ").replace(".", ",") }}</td>
+                {% endfor %}
+                {% if ligne.total is defined and not total_annuel %}
+                    <td>
+                    <strong>{{ "{:,.2f}".format(ligne.total).replace(",", " ").replace(".", ",") }}</strong>
+                    </td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+                </tr>
+            {% endfor %}
+
+            {# âââ Ligne UNIQUE du total gÃ©nÃ©ral âââ #}
+            {% set t = (lignes | selectattr('niveau','equalto','total-general') | list).0 %}
+            {% if t %}
+                <tr class="total-general">
+                <td colspan="{{ 2 + periodes|length }}">TOTAL GÃ©nÃ©ral</td>
+                <td>
+                    <strong>{{ "{:,.2f}".format(t.total).replace(",", " ").replace(".", ",") }}</strong>
+                </td>
+                </tr>
+            {% endif %}
+        </tbody>
+
+    </table>
+</body>
+</html>
+

@@ -1,0 +1,65 @@
+{# templates_comptabilite/num_ecriture_edition.html #}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Édition écriture n°{{ num_ecriture }}</title>
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='style_comptabilite.css') }}"
+        type="text/css" />
+</head>
+<body class="compta-body">
+  <div class="container">
+    <nav class="toolbar">
+      <a class="action-btn" href="{{ url_for('grand_livre_full') }}">RETOUR</a>
+      <button class="action-btn" onclick="window.print()">IMPRIMER</button>
+      <a class="action-btn" href="#">AIDE</a>
+      <button class="action-btn" form="edit-form" type="submit">MAJ</button>
+      <a class="action-btn" href="{{ url_for(source_type + '_ecriture') }}">CRÉER</a>
+    </nav>
+
+    <h1>Modifier écriture n°{{ num_ecriture }}</h1>
+
+    <form id="edit-form" method="post" class="edit-form">
+      <div class="fields">
+        <div class="left-fields">
+          <label>N° compte :
+            <input name="num_compte" value="{{ data['N° compte'] }}" />
+          </label>
+          <label>Intitulé :
+            <input name="intitule" value="{{ data['Intitulé du compte'] }}" />
+          </label>
+          <label>Période :
+            <input name="periode"
+                   type="month"
+                   value="{{ data['Période'] }}" />
+          </label>
+          <label>Date :
+            <input name="date"
+                   type="date"
+                   value="{{ data['Date'] }}" />
+          </label>
+        </div>
+        <div class="right-fields">
+          <label>Libellé :
+            <input name="libelle" value="{{ data['Libellé'] }}" />
+          </label>
+          <label>Fournisseur :
+            <input name="fournisseur" value="{{ data['Fournisseur'] }}" />
+          </label>
+          <label>Débit :
+            <input name="debit"
+                   type="number" step="0.01"
+                   value="{{ data['Débit'] }}" />
+          </label>
+          <label>Crédit :
+            <input name="credit"
+                   type="number" step="0.01"
+                   value="{{ data['Crédit'] }}" />
+          </label>
+        </div>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
