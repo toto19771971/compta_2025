@@ -6,7 +6,7 @@
     <title>Nouvelle écriture manuelle au journal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style_principal.css') }}">
-    
+
     <style>
       /* ── Reset rapide ── */
       body {
@@ -15,9 +15,9 @@
         font-family: Arial, sans-serif;
         background: #f5f5f5;
       }
-    
+
       /* ── Boutons du haut, fixes en viewport ── */
-      .top-actions {
+      .toolbar {
         position: fixed;
         top: 0;
         left: 50%;
@@ -33,7 +33,7 @@
         width: 100%;
         max-width: 1200px;
       }
-      .top-actions a {
+      .toolbar a {
         flex: 0 1 auto;
         padding: 10px 20px;
         background: #ccffcc;
@@ -42,16 +42,15 @@
         font-weight: bold;
         border-radius: 8px;
       }
-    
-      .top-actions button{
-        flex:0 1 auto;
-        padding:10px 20px;
-        background:#ccffcc;     /* même vert que les <a> */
-        color:#0e130e;
-        font-weight:bold;
-        border:0;
-        border-radius:8px;
-        cursor:pointer;
+      .toolbar button {
+        flex: 0 1 auto;
+        padding: 10px 20px;
+        background: #ccffcc;
+        color: #0e130e;
+        font-weight: bold;
+        border: 0;
+        border-radius: 8px;
+        cursor: pointer;
       }
 
       /* ── Corps du formulaire, repoussé sous les boutons ── */
@@ -61,17 +60,17 @@
         max-width: 1200px;
         margin: 0 auto;
         padding: 30px;
-        padding-top: 100px;    /* <— laisse de la place sous .top-actions */
+        padding-top: 100px;    /* <— laisse de la place sous .toolbar */
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       }
-    
+
       h1 {
         text-align: center;
         font-size: 1.8em;
         margin-bottom: 30px;
       }
-    
+
       /* ── Formulaire ── */
       .form-section { margin-bottom: 30px; }
       .row {
@@ -109,7 +108,7 @@
         border: 1px solid #ccc;
         border-radius: 4px;
       }
-    
+
       /* ── Tableau des écritures ── */
       table {
         width: 100%;
@@ -125,21 +124,20 @@
         background: #e8f1fb;
         text-align: center;
       }
-    
+
       /* Colonnes fixes pour alignement */
       .col-compte   { width: 30%; }
       .col-intitule { width: 40%; }
       .col-debit    { width: 15%; text-align: right; }
       .col-credit   { width: 15%; text-align: right; }
-    
+
       /* Sélecteur compte */
       .accounts-col select {
         width: 100%;
         padding: 6px;
         font-size: 1em;
       }
-    
-    
+
       /* Bouton "Ajouter +" */
       .add-row {
         display: inline-block;
@@ -153,7 +151,7 @@
         border: none;
         align-items: left;
       }
-    
+
       /* ── Tableau total ── */
       #total-table {
         width: 100%;
@@ -163,90 +161,74 @@
       #ecritures_table td input,
       .total-row td {
         background: #fff !important;
-        border:     1px solid #000 !important;
+        border: 1px solid #000 !important;
       }
       #total-table td {
         border: 1px solid #4a90e2;
         padding: 8px;
         font-weight: bold;
       }
-
-    
       #total-table td:first-child {
         text-align: left;
         background: #fff !important;
         border: 1px solid #000 !important;
       }
-    
-      /* Supprime bordures internes de la cellule vide */
       #total-table td:nth-child(2) {
         border-left: none;
         border-right: none;
         background: #fff !important;
         border: 1px solid #000 !important;
       }
-      /* Alignement numérique */
       #ecritures_table td:nth-child(4),
       #ecritures_table td:nth-child(5),
       #total-table td:nth-child(4),
       #total-table td:nth-child(5) {
         text-align: left;
-        
         border: 1px solid #000 !important;
       }
-      /* centre la 2e colonne (Intitulé) */
       #ecritures_table td:nth-child(2),
-      #ecritures_table th:nth-child(2){
-        text-align:center;
+      #ecritures_table th:nth-child(2) {
+        text-align: center;
       }
-      
       .total-row td {
         background: #fff !important;
-        border:     1px solid #5717b8 !important;
+        border: 1px solid #5717b8 !important;
       }
-      
-
       #total-table #total_debit,
       #total-table #total_credit {
         background: #fff !important;
-        border:     1px solid #000 !important;
+        border: 1px solid #000 !important;
       }
-
-
       #total-table td#total_debit,
       #total-table td#total_credit {
         background: #fff !important;
-        border:     1px solid #000 !important;
+        border: 1px solid #000 !important;
       }
-      
       #ecritures_table td select,
       #ecritures_table td input {
         height: 2.8em;
         box-sizing: border-box;
       }
-      
-      
-
-
     </style>
-    
 </head>
 <body class="comptabilite comp­ta-body">
 
   <script id="accounts-data" type="application/json">
     {{ accounts | default([]) | tojson | safe }}
   </script>
-  
-  <div class="top-actions">
-    <a href="{{ url_for('grand_livre_accueil') }}" class="btn-top">RETOUR</a>
+
+  <div class="toolbar">
+    <a href="{{ url_for('grand_livre_accueil') }}">RETOUR</a>
     <a href="#">AIDE</a>
     <a href="#">IMPRIMER</a>
     <button class="action-btn" type="button" id="btn-create">CRÉER</button>
     <a href="#">SUPPRIMER</a>
     <a href="#">TÉLÉCHARGER EN PDF</a>
-    <a href="{{ url_for('grand_livre_full') }}" class="btn btn-primary">Grand livre</a>
+    <button type="button" onclick=window.location.href="{{ url_for('grand_livre_full') }}">
+      Grand Livre
+    </button>
   </div>
-    
+
   <div class="container">
     <h1>Nouvelle écriture manuelle au journal</h1>
     <form method="post" action="{{ url_for('submit_ecriture_man') }}">
@@ -292,7 +274,8 @@
         </div>
       </div>
 
-      <div class="form-section"> <br><br><br>
+      <div class="form-section">
+        <br><br><br>
         <table id="ecritures_table">
           <colgroup>
             <col class="col-compte">
@@ -313,7 +296,7 @@
               <td class="accounts-col">
                 <select name="N° compte[]" onchange="onAccountChange(this)">
                   <option value="">_Sélectionner_</option>
-                  {% for account in accounts %}
+                  {% for account in accounts %} 
                     <option
                       value="{{ account.num_compte }}"
                       data-intitule="{{ account.intitule }}"
@@ -350,25 +333,19 @@
             </tr>
           </tbody>
         </table>
-
         <div style="width:100%; text-align:left; margin:20px 0;">
-          <div class="add-row" onclick="addRow()">Ajouter +</div>
+          <div class="action-btn" onclick="addRow()">Ajouter +</div>
         </div>
-
         <table style="margin-top: 10px; width: 100%;">
           <colgroup>
             <col class="col-compte">
             <col class="col-intitule">
             <col class="col-debit">
             <col class="col-credit">
-          </colgroup>              
+          </colgroup>
           <tr class="total-row">
             <td colspan="1" style="text-align:left; border-right:none;">Total</td>
             <td style="border-left:none; border-right:none;"></td>
-            
-            
-            
-            <!-- Remplacez les <td> par des inputs dans des <td> -->
             <td style="text-align:right;">
               <input
                 type="text"
@@ -388,11 +365,6 @@
                 style="width:100%; height:2.8em; box-sizing:border-box; padding:0 6px; background:#fff !important; border:1px solid #000; text-align:right;" />
             </td>
           </tr>
-  
-
-
-
-          </tr>
         </table>
       </div>
     </form>
@@ -401,11 +373,6 @@
   <script>
     console.log('RAW accounts-data:', document.getElementById('accounts-data').textContent);
 
-    /* ---------- préparation des données ---------- */
-
-    const initialSelect = document.getElementsByName("N° compte[]")[0];
-    
-
     const accounts = JSON.parse(
       document.getElementById('accounts-data').textContent
     ).map(a => ({
@@ -413,31 +380,12 @@
       intitule   : (a['intitule']   ?? a['Intitulé du compte'] ?? '').trim()
     }));
 
-    console.log('Accounts chargés :', accounts);
-    console.log('Nb comptes reçus :', accounts.length);
-    console.table(accounts.slice(0, 5));   // aperçu des 5 premiers
-
-    /* ---------- remplissage du premier <select> avec pré‑sélection ---------- */
-    /*if (initialSelect) {
-      const selectedNum = '{{ data.get("N° compte","") }}';
-      let html = '<option value="">_Sélectionner_</option>';
-      accounts.forEach(acc => {
-        const isSel = acc.num_compte === selectedNum ? ' selected' : '';
-        html += `<option value="${acc.num_compte}"
-                       data-intitule="${acc.intitule}"${isSel}>
-                    ${acc.num_compte} – ${acc.intitule}
-                 </option>`;
-      });
-      initialSelect.innerHTML = html;
-    } */
-
-    /* ---------- ajout d’une ligne ---------- */
     function addRow () {
       const tbody  = document.querySelector('#ecritures_table tbody');
       let opts = '<option value="" data-intitule="">_Sélectionner_</option>';
       accounts.forEach(acc => {
-        const selNum = '{{ data.get("N° compte","") }}';
-        const isSel = acc.num_compte === selNum ? ' selected' : '';
+        const selectedNum = '{{ data.get("N° compte","") }}';
+        const isSel = acc.num_compte === selectedNum ? ' selected' : '';
         opts += `<option value="${acc.num_compte}"
                          data-intitule="${acc.intitule}"${isSel}>
                     ${acc.num_compte} – ${acc.intitule}
@@ -458,7 +406,6 @@
       tbody.appendChild(row);
     }
 
-    /* --- recalcul automatique Débit / Crédit --- */
     function recalcTotals() {
       const debits  = [...document.querySelectorAll('input[name="debit[]"]')];
       const credits = [...document.querySelectorAll('input[name="credit[]"]')];
@@ -478,7 +425,6 @@
       input.value = opt ? (opt.dataset.intitule || '') : '';
     }
 
-    /* -------- envoi de l’écriture -------- */
     document.getElementById('btn-create').addEventListener('click', () => {
       const form = document.querySelector('form');
       const data = new FormData(form);
@@ -499,10 +445,9 @@
           form.reset();
           const tbody = document.querySelector('#ecritures_table tbody');
           tbody.innerHTML = tbody.firstElementChild.outerHTML;
-          tbody.querySelectorAll('input').forEach(i => i.value = '');
           recalcTotals();
         } else {
-          alert('⛔ Impossible d’enregistrer : ' + resp.reason);
+          alert("⛔ Impossible d'enregistrer : " + resp.reason);
         }
       })
       .catch(err => alert('Erreur réseau : ' + err));
