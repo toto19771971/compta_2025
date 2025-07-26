@@ -81,9 +81,9 @@
     <button class="action-btn" id="btn-create-facture" type="button">Créer</button>
     <button class="action-btn" id="btn-update" type="button">MAJ</button>
     <button class="action-btn" onclick="location.href='/liste_factures_fournisseurs'">Liste</button>
-    <button class="action-btn" id="btn-publish-gl" type="button">Publier GL</button>
+    <button class="toolbar"onclick="location.href='/grand_livre_full'"> Publier le GL</button>
+    <button class="action-btn" id="btn-double-create" >Double création</button>
     <button class="action-btn" id="btn-clear" type="button">Vider</button>
-    <button id="btn-double-create">Double création</button>
   </div>
 
   <!-- Formulaire unique -->
@@ -331,24 +331,7 @@
 
 
 
-    document.getElementById('btn-publish-gl')
-  .addEventListener('click', async () => {
-    const formData = new FormData(
-      document.getElementById('factureContainer')
-    );
-    const res = await fetch('/publier_grand_livre_four', {
-      method: 'POST',
-      body: formData
-    });
-
-    if (res.ok) {
-      // ligne publiée → on affiche le Grand Livre
-      window.location.href = '/grand_livre_full';
-    } else {
-      // échec d’enregistrement
-      alert('Erreur enregistrement au Grand Livre');
-    }
-  });
+    
 
       
 
@@ -382,7 +365,8 @@
               // On récupère le JSON contenant num_ecriture
               const { num_ecriture } = await res.json();
               // Puis on redirige
-              window.location.href = `/editer/${num_ecriture}`;
+              alert('La double création est bien réussie (n°' + num_ecriture + ')');
+;
             });
 
           

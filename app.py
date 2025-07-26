@@ -1239,9 +1239,10 @@ def factures_fournisseurs_result():
 @app.route('/double_creation', methods=['POST'])
 def double_creation():
     import sqlite3
-    from datetime import datetime
 
-    # ── Bloc 1 : Calcul du prochain numéro d’écriture ───────────────────
+    print("▶▶▶ double_creation start") 
+
+    # Bloc 1 : prochain numéro
     def get_next_num_ecriture():
         conn2 = sqlite3.connect("grand_livre.db")
         cur2  = conn2.cursor()
@@ -1249,19 +1250,23 @@ def double_creation():
             cur2.execute(
                 "SELECT MAX(CAST(`Numéro d'écriture` AS INTEGER)) FROM Sheet1"
             )
-            result = cur2.fetchone()[0]
-            return int(result) + 1 if result else 1
+            res = cur2.fetchone()[0]
+            return int(res) + 1 if res else 1
         finally:
             conn2.close()
 
-    # ── Bloc 2 : Lecture des données du formulaire ───────────────────
+    # Bloc 2 : lecture form
     raw = {k: request.form.getlist(k) for k in request.form.keys()}
-    form_data = {
-        k: (';'.join(v) if len(v) > 1 else v[0])
-        for k, v in raw.items()
-    }
+    form_data = {k: (';'.join(v) if len(v) > 1 else v[0])
+                 for k, v in raw.items()}
+    
+    print("DEBUG comptes_ht   =", raw.get('compte[]', []))
+    print("DEBUG comptes_tva  =", raw.get('compte_tva[]', []))
+    print("DEBUG base_ht_vals =", raw.get('base_ht[]', []))
+    print("DEBUG tva_vals     =", raw.get('montant_tva[]', []))
 
-    # ── Bloc 3 : Connexion SQLite et préparation des variables ────────
+
+    # Bloc 3 : connexion
     conn = engine.raw_connection()
     cur  = conn.cursor()
     num_ecriture  = get_next_num_ecriture()
@@ -1274,41 +1279,45 @@ def double_creation():
     no_facture    = form_data.get('No de facture', '')
     montant       = float(form_data.get('Montant', 0) or 0)
 
-    # ── Bloc 4 : Création de la colonne Intitulé si nécessaire ──────
+    # Bloc 4 : ajouter colonne si besoin
     try:
-        cur.execute(
-            'ALTER TABLE Sheet1 ADD COLUMN "Intitulé du compte" TEXT'
-        )
+        cur.execute('ALTER TABLE Sheet1 ADD COLUMN "Intitulé du compte" TEXT')
     except:
         pass
 
-    # ── Bloc 5 : Insertion de l’écriture du fournisseur ───────────────
-    raw_acc = raw.get(
-        'No compte Fournisseur',
-        [form_data.get('No compte Fournisseur', '')]
-    )[0]
+
+        # juste après avoir calculé num_ecriture
+    cur.execute(
+    'DELETE FROM Sheet1 WHERE "Numéro d\'écriture" = ?',
+    (num_ecriture,)
+    )
+
+
+    # Bloc 5 : écriture Fournisseur (une seule fois)
+    raw_acc = raw.get('No compte Fournisseur', [form_data.get('No compte Fournisseur','')])[0]
     num_f, sep, intit_f = raw_acc.partition(' – ')
     num_f   = num_f.strip()
     intit_f = intit_f.strip() if sep else ''
+
+    print("→ INSERT fournisseur")
+
     cur.execute(
         """INSERT INTO Sheet1
            ("N° compte","Intitulé du compte","Période","Date",
             "Libellé","Numéro d'écriture","Fournisseur","Débit","Crédit")
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (
-            num_f, intit_f, periode, date_fact,
-            no_facture, num_ecriture,
-            form_data.get('Fournisseur',''), 0, montant
-        )
+        (num_f, intit_f, periode, date_fact,
+         no_facture, num_ecriture,
+         form_data.get('Fournisseur',''), 0, montant)
     )
 
-    # ── Bloc 6 : Insertion des lignes HT et TVA ───────────────────────
-    for i in range(len(comptes_ht)):
-        # HT
-        num_ht, sep_ht, intit_ht = comptes_ht[i].partition(' – ')
-        num_ht    = num_ht.strip()
-        intit_ht  = intit_ht.strip() if sep_ht else ''
-        debit_ht  = float(base_ht_vals[i] or 0)
+        # ── Bloc 6 : écriture HT unique ────────────────────────────────
+    print("→ INSERT HT")  # debug
+    if comptes_ht:
+        num_ht, sep_ht, intit_ht = comptes_ht[0].partition(' – ')
+        num_ht   = num_ht.strip()
+        intit_ht = intit_ht.strip() if sep_ht else ''
+        debit_ht = float(base_ht_vals[0] or 0)
         cur.execute(
             """INSERT INTO Sheet1
                ("N° compte","Intitulé du compte","Période","Date",
@@ -1319,11 +1328,14 @@ def double_creation():
                 no_facture, num_ecriture, '', debit_ht, 0
             )
         )
-        # TVA
-        num_tva, sep_tva, intit_tva = comptes_tva[i].partition(' – ')
+
+    # ── Bloc 7 : écriture TVA unique ───────────────────────────────
+    print("→ INSERT TVA")  # debug
+    if comptes_tva:
+        num_tva, sep_tva, intit_tva = comptes_tva[0].partition(' – ')
         num_tva    = num_tva.strip()
         intit_tva  = intit_tva.strip() if sep_tva else ''
-        debit_tva  = float(tva_vals[i] or 0)
+        debit_tva  = float(tva_vals[0] or 0)
         cur.execute(
             """INSERT INTO Sheet1
                ("N° compte","Intitulé du compte","Période","Date",
@@ -1335,44 +1347,35 @@ def double_creation():
             )
         )
 
-    # ── Bloc 7 : Commit et fermeture de la connexion SQLite ──────────
+
+    # Bloc 8 : commit + fermeture
     conn.commit()
     cur.close()
+    conn.close()
 
-    # ── Bloc 8 : Ajout de la facture dans l’Excel ────────────────────
+    # Bloc 9 : mise à jour Excel…
     df = pd.read_excel(FACTURES_PATH, dtype=str, keep_default_na=False)
-    df.columns = [col.strip().replace("’", "'") for col in df.columns]
+    df.columns = [c.strip().replace("’","'") for c in df.columns]
     new_row = {
         'Nom du fournisseur'    : form_data.get('Fournisseur',''),
         'No compte Fournisseur' : form_data.get('No compte Fournisseur',''),
         'Condition de paiement' : form_data.get('Condition de paiement',''),
         'Date de facture'       : form_data.get('Date de facture',''),
         'Date d\'échéance'      : form_data.get('Date échéance',''),
-        'Date paiement prévue'  : form_data.get('Date paiement prévue',''),
         'Période'               : form_data.get('Période',''),
         'Montant'               : form_data.get('Montant',''),
-        'Balance'               : form_data.get('Balance',''),
         'No de facture'         : form_data.get('No de facture',''),
-        'No de commande'        : form_data.get('No de commande',''),
-        'Statut'                : form_data.get('Statut',''),
-        'No de compte'          : ';'.join(raw.get('compte[]', [])),
-        'Libellé du compte'     : ';'.join(raw.get('libelle_compte[]', [])),
-        'Quantité'              : ';'.join(raw.get('quantite[]', [])),
-        'Unité'                 : ';'.join(raw.get('unite[]', [])),
-        'Somme brute'           : ';'.join(raw.get('base_ht[]', [])),
-        'No de compte TVA'      : ';'.join(raw.get('compte_tva[]', [])),
-        'Libellé TVA'           : ';'.join(raw.get('libelle_tva[]', [])),
-        'Taux TVA'              : ';'.join(raw.get('taux_tva[]', [])),
-        'Montant TVA'           : ';'.join(raw.get('montant_tva[]', [])),
-        'Total TTC'             : form_data.get('total_ttc',''),
-        'Paiement'              : '',
+        'No de compte'          : ';'.join(comptes_ht),
+        'Somme brute'           : ';'.join(base_ht_vals),
+        'No de compte TVA'      : ';'.join(comptes_tva),
+        'Montant TVA'           : ';'.join(tva_vals),
         'Numéro d\'écriture'    : str(num_ecriture)
     }
     df.loc[len(df)] = new_row
     df.to_excel(FACTURES_PATH, index=False)
 
-    # ── Bloc 9 : Renvoi de la réponse JSON au front-end ──────────────
     return jsonify({"num_ecriture": num_ecriture}), 200
+
 
 
 
