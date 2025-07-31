@@ -829,74 +829,98 @@ def publier_grand_livre():
 def editer_ecriture(num_ecriture):
     print(f"\n====== DÉBUT TRAITEMENT ÉCRITURE {num_ecriture} ======")
 
-
+    # ── Bloc A : Récupération des comptes pour le dropdown ───────────
     conn_acc = sqlite3.connect('grand_livre.db', check_same_thread=False)
     df_acc = pd.read_sql_query(
-        'SELECT DISTINCT "N° compte" AS num_compte, '
-        '"Intitulé du compte" AS intitule '
+        'SELECT DISTINCT "N° compte" AS num_compte, "Intitulé du compte" AS intitule '
         'FROM Sheet1 ORDER BY "N° compte"',
         conn_acc
     )
     accounts = df_acc.to_dict(orient='records')
     conn_acc.close()
 
-
-
-    # 1) Chargement des fichiers Excel
-    print("[INFO] Chargement des fichiers Excel...")
+    # ── Bloc B : Chargement des fichiers Excel ────────────────────────
+    print("[INFO] Chargement des fichiers Excel…")
     df_four = pd.read_excel('bd_factures_fournisseurs.xlsx', dtype=str, keep_default_na=False)
     df_cli  = pd.read_excel('bd_factures_clients.xlsx',    dtype=str, keep_default_na=False)
     df_sal  = pd.read_excel('bd_salaires.xlsx',            dtype=str, keep_default_na=False)
 
-    # 2) Détection séquentielle de la provenance
+    # ── Bloc C : Détection de la source (fournisseurs / clients / salaires) ───
     source, tpl, df = None, None, None
 
     # --- fournisseurs
-    col_four = pd.to_numeric(df_four["Numéro d'écriture"], errors="coerce").dropna().astype(int)
+    df_four.columns = [c.strip().replace("’", "'") for c in df_four.columns]
+    print("[DEBUG] Colonnes Excel fournisseurs :", df_four.columns.tolist())
+
+    # nettoyage NBSP + espaces sur Numéro d'écriture
+    df_four["Numéro d'écriture"] = (
+        df_four["Numéro d'écriture"]
+        .astype(str)
+        .str.replace("\u00A0", "")
+        .str.strip()
+    )
+    print("[DEBUG] Valeurs brutes Numéro d'écriture :", df_four["Numéro d'écriture"].tolist())
+
+    col_four = (
+        pd.to_numeric(df_four["Numéro d'écriture"], errors="coerce")
+        .dropna()
+        .astype(int)
+    )
+
+    print(">> [TRACE] df_four.columns =", df_four.columns.tolist())
+    print(">> [TRACE] valeurs brutes Numéro d'écriture =", df_four["Numéro d'écriture"].tolist())
+
     if num_ecriture in col_four.values:
         print("[INFO] Écriture trouvée dans les fournisseurs.")
-        source, tpl, df = 'four', 'templates_fournisseurs/factures_fournisseurs_ecriture.html', df_four
+        source, tpl, df = (
+            'four',
+            'templates_fournisseurs/factures_fournisseurs_ecriture.html',
+            df_four
+        )
 
-    # --- clients
-    #if source is None:
-        #col_cli = pd.to_numeric(df_cli["Numéro d'écriture"], errors="coerce").dropna().astype(int)
-        #if num_ecriture in col_cli.values:
-            #print("[INFO] Écriture trouvée dans les clients.")
-            #source, tpl, df = 'cli', 'templates_clients/factures_clients_ecriture.html', df_cli
+    # --- clients / salaires (désactivés pour l’instant)  
+    # if source is None: …
 
-    # --- salaires
-    #if source is None:
-        #col_sal = pd.to_numeric(df_sal["Numéro d'écriture"], errors="coerce").dropna().astype(int)
-        ##if num_ecriture in col_sal.values:
-            #print("[INFO] Écriture trouvée dans les salaires.")
-            #source, tpl, df = 'sal', 'templates_salaires/salaires_ecriture.html', df_sal
+    # ── Bloc D : Si trouvé en Excel ───────────────────────────────────
+    print("▶ num_ecriture reçu :", num_ecriture, type(num_ecriture))
+    print("▶ Valeurs de Numéro d'écriture Excel :", col_four.tolist())
 
-    # 3) Si trouvé en Excel
+    
+
+
     if source:
         print(f"[INFO] Chargement de la ligne pour {source}.")
         numeric_series = pd.to_numeric(df["Numéro d'écriture"], errors="coerce")
         row = df.loc[numeric_series == num_ecriture]
         if row.empty:
             print(f"[ERREUR] Ligne introuvable dans {source}.")
-            return "Erreur : ligne introuvable", 404
+            return "Erreur : ligne introuvable", 404
         data = row.iloc[0].to_dict()
         print("🔍 Valeurs Excel reçues :", data)
-        return render_template(tpl, data=data, accounts=accounts, df_fournisseurs=df_four.to_dict(orient='records'))
+        return render_template(
+            tpl,
+            data=data,
+            accounts=accounts,
+            df_fournisseurs=df_four.to_dict(orient='records')
+        )
 
-    # 4) Fallback SQLite pour écriture manuelle
-    print("[INFO] Aucune donnée Excel ; recherche SQLite...")
+    # ── Bloc E : Fallback SQLite pour écriture manuelle ───────────────
+    print("[INFO] Aucune donnée Excel ; recherche SQLite…")
     conn = sqlite3.connect('grand_livre.db', check_same_thread=False)
     query = 'SELECT * FROM Sheet1 WHERE "Numéro d\'écriture" = ?'
     row = pd.read_sql_query(query, conn, params=(num_ecriture,))
+    conn.close()
     if row.empty:
         print(f"[ERREUR] Écriture {num_ecriture} non trouvée.")
-        return "Erreur : écriture non trouvée", 404
+        return "Erreur : écriture non trouvée", 404
+
     data = row.iloc[0].to_dict()
     print(f"[OK] SQLite data = {data}")
-    print("[DEBUG] data keys:", list(data.keys()))
-    print("[DEBUG] data content:", data)
-    return render_template('templates_comptabilite/grand_livre_ecriture.html', data=data, accounts=accounts)
-
+    return render_template(
+        'templates_comptabilite/grand_livre_ecriture.html',
+        data=data,
+        accounts=accounts
+    )
 
 
 
