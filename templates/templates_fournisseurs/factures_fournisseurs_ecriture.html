@@ -8,7 +8,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <link rel="stylesheet" href="static/style_fournisseurs.css?v=3" type="text/css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_fournisseurs.css') }}" type="text/css" />
+
   <meta charset="UTF-8">
   <title>Prototype Intégré</title>
   <style>
@@ -88,17 +89,14 @@
 
   <!-- Formulaire unique -->
   <form id="factureContainer" method="post" action="/creer_et_publier">
-  <!-- ← Insérez ICI les 2 lignes ci‑dessus -->
   <input type="hidden" name="module" value="factures_fournisseurs">
   <input type="hidden" name="orig_id" value="{{ data.orig_id | default('') }}">
     
-
-
     <!-- Inputs statiques -->
     <div class="grid-container">
       <div class="form-left">
         <label for="fournisseur">Fournisseur :</label>
-        <input id="fournisseur" name="Fournisseur" type="text" list="liste_noms" autocomplete="off" placeholder="Tapez le fournisseur…" />
+        <input id="fournisseur" name="Nom du fournisseur" type="text" list="liste_noms" autocomplete="off" placeholder="Tapez le fournisseur…" value="{{ fournisseur|default('') }}" />
         <datalist id="liste_noms">
           {% for f in df_fournisseurs %}
             <option value="{{ f['Nom du fournisseur'] }}"></option>
@@ -106,39 +104,39 @@
         </datalist>
 
         <label for="num_compte_fournisseur">No compte Fournisseur :</label>
-        <input id="num_compte_fournisseur" name="No compte Fournisseur" type="text">
+        <input id="num_compte_fournisseur" name="No compte Fournisseur" type="text" value="{{ compte_fournisseur|default('') }}">
 
         <label for="condition_paiement">Condition de paiement :</label>
-        <input id="condition_paiement" name="Condition de paiement" type="text">
+        <input id="condition_paiement" name="Condition de paiement" type="text" value="{{ condition_paiement|default('') }}">
 
         <label for="date_facture">Date de facture :</label>
-        <input id="date_facture" name="Date de facture" type="date">
+        <input id="date_facture" name="Date de facture" type="date" value="{{ date_facture|default('') }}">
 
         <label for="date_echeance">Date échéance :</label>
-        <input id="date_echeance" name="Date échéance" type="date">
+        <input id="date_echeance" name="Date échéance" type="date" value="{{ date_echeance|default('') }}">
 
         <label for="date_paiement">Date paiement prévue :</label>
-        <input id="date_paiement" name="Date paiement prévue" type="date">
+        <input id="date_paiement" name="Date paiement prévue" type="date" value="{{ date_paiement_prevue|default('') }}">
 
         <label for="periode">Période (MM/YYYY) :</label>
-        <input id="periode" name="Période" type="month">
+        <input id="periode" name="Période" type="month" value="{{ periode|default('') }}">
 
         <label for="montant">Montant :</label>
-        <input id="montant" name="Montant" type="text">
+        <input id="montant" name="Montant" type="text" value="{{ montant|default('') }}">
 
         <label for="balance">Balance :</label>
-        <input id="balance" name="Balance" type="text">
+        <input id="balance" name="Balance" type="text" value="{{ balance|default('') }}">
       </div>
 
       <div class="form-right">
         <label for="num_facture">No de facture :</label>
-        <input id="num_facture" name="No de facture" type="text">
+        <input id="num_facture" name="No de facture" type="text" value="{{ no_facture|default('') }}">
 
         <label for="num_commande">No de commande :</label>
-        <input id="num_commande" name="No de commande" type="text">
+        <input id="num_commande" name="No de commande" type="text" value="{{ no_commande|default('') }}">
 
         <label for="statut">Statut :</label>
-        <input id="statut" name="Statut" type="text">
+        <input id="statut" name="Statut" type="text" value="{{ statut|default('') }}">
       </div>
     </div>
 
@@ -155,11 +153,11 @@
       </thead>
       <tbody id="invoice-body">
         <tr>
-          <td><input name="compte[]"        type="text" /></td>
-          <td><input name="libelle_compte[]" type="text" /></td>
-          <td><input name="quantite[]"      type="number" step="1" inputmode="numeric" /></td>
-          <td><input name="unite[]"         type="number" step="1" inputmode="numeric" /></td>
-          <td><input name="base_ht[]"   type="number" step="0.01" inputmode="decimal" /></td>
+          <td><input name="compte[]" type="text" value="{{ no_compte|default('') }}"/></td>
+          <td><input name="libelle_compte[]" type="text" value="{{ libelle_compte|default('') }}"/></td>
+          <td><input name="quantite[]" type="number" step="1" inputmode="numeric" value="{{ quantite|default('') }}"/></td>
+          <td><input name="unite[]" type="number" step="1" inputmode="numeric" value="{{ unite|default('') }}"/></td>
+          <td><input name="base_ht[]" type="number" step="0.01" inputmode="decimal" value="{{ somme_brute|default('') }}"/></td>
         </tr>
       </tbody>
     </table>
@@ -177,17 +175,17 @@
       </thead>
       <tbody id="tax-body">
         <tr>
-          <td><input name="compte_tva[]"  type="text" /></td>
-          <td><input name="libelle_tva[]" type="text" /></td>
-          <td><input name="taux_tva[]"    type="number" step="0.01" inputmode="decimal" /></td>
-          <td><input name="montant_tva[]" type="number" step="0.01" inputmode="decimal" /></td>
+          <td><input name="compte_tva[]" type="text" value="{{ no_compte_tva|default('') }}"/></td>
+          <td><input name="libelle_tva[]" type="text" value="{{ libelle_tva|default('') }}"/></td>
+          <td><input name="taux_tva[]" type="number" step="0.01" inputmode="decimal" value="{{ taux_tva|default('') }}"/></td>
+          <td><input name="montant_tva[]" type="number" step="0.01" inputmode="decimal" value="{{ montant_tva|default('') }}"/></td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
           <td colspan="3" style="border:none;"></td>
           <td colspan="1" class="total-ttc">
-            Total TTC : <input id="total_ttc" name="total_ttc" readonly />
+            Total TTC : <input id="total_ttc" name="total_ttc" readonly value="{{ total_ttc|default('') }}"/>
           </td>
         </tr>
       </tfoot>
@@ -197,19 +195,19 @@
     <!-- Templates -->
     <template id="tpl-invoice-line">
       <tr>
-        <td><input name="compte[]"        type="text" /></td>
+        <td><input name="compte[]" type="text" /></td>
         <td><input name="libelle_compte[]" type="text" /></td>
-        <td><input name="quantite[]"      type="number" step="1" inputmode="numeric" /></td>
-        <td><input name="unite[]"         type="number" step="1" inputmode="numeric" /></td>
-        <td><input name="base_ht[]"       type="number" step="0.01" inputmode="decimal" /></td>
+        <td><input name="quantite[]" type="number" step="1" inputmode="numeric" /></td>
+        <td><input name="unite[]" type="number" step="1" inputmode="numeric" /></td>
+        <td><input name="base_ht[]" type="number" step="0.01" inputmode="decimal" /></td>
       </tr>
     </template>
 
     <template id="tpl-tax-line">
       <tr>
-        <td><input name="compte_tva[]"  type="text" /></td>
+        <td><input name="compte_tva[]" type="text" /></td>
         <td><input name="libelle_tva[]" type="text" /></td>
-        <td><input name="taux_tva[]"    type="number" step="0.01" inputmode="decimal" /></td>
+        <td><input name="taux_tva[]" type="number" step="0.01" inputmode="decimal" /></td>
         <td><input name="montant_tva[]" type="number" step="0.01" inputmode="decimal" /></td>
       </tr>
     </template>
