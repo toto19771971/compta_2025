@@ -702,8 +702,8 @@ def submit_ecriture_man():
         libelle     = request.form.get('libelle')
 
         # 🔵 Données ligne par ligne
-        comptes   = request.form.getlist('N° compte[]')
-        intitules = request.form.getlist('Intitule[]')
+        comptes   = request.form.getlist('num_compte[]')
+        intitules = request.form.getlist('intitule[]')
         debits    = request.form.getlist('debit[]')
         credits   = request.form.getlist('credit[]')
 
@@ -832,6 +832,14 @@ def editer_ecriture(num_ecriture):
     import pandas as pd
     import sqlite3
 
+    import pandas as pd
+
+    df_accounts = pd.read_excel("plan_comptable.xlsx")
+    accounts = [
+        {"num_compte": str(row["N° compte"]), "intitule": row["Intitulé du compte"]}
+        for _, row in df_accounts.iterrows()
+    ]
+
     # --- Mapping des champs Excel (DB fournisseurs) vers les "name" du formulaire HTML fournisseurs ---
     mapping_fourn = {
         # clé Excel                :  name du champ HTML (exacts dans factures_fournisseurs_ecriture.html)
@@ -857,8 +865,6 @@ def editer_ecriture(num_ecriture):
         "Taux TVA": "taux_tva",
         "Montant TVA": "montant_tva",
         "Total TTC": "total_ttc",
-        "Paiement": "paiement",
-        "Numéro d'écriture": "numero_ecriture"
     }
 
     # --- Mapping SQL (grand livre) vers le formulaire écriture manuelle ---
@@ -867,15 +873,17 @@ def editer_ecriture(num_ecriture):
         "N° compte": "num_compte",
         "Intitulé du compte": "intitule",
         "Période": "periode",
-        "Date": "date",
+        "Date": "date_comptabilisation",
         "Libellé": "libelle",
-        "Numéro d'écriture": "num_ecriture",
         "Fournisseur": "fournisseur",
         "Débit": "debit",
         "Crédit": "credit"
     }
 
     # Chercher dans Excel
+    # … dans ta route editer_ecriture(num_ecriture):
+
+    # --------- EXCEL (fournisseurs) -----------
     df_fourn = pd.read_excel("bd_factures_fournisseurs.xlsx")
     ligne_fourn = df_fourn[df_fourn["Numéro d'écriture"] == num_ecriture]
     if not ligne_fourn.empty:
@@ -884,23 +892,50 @@ def editer_ecriture(num_ecriture):
         for k, v in ligne.items():
             if k in mapping_fourn:
                 nom_champ = mapping_fourn[k]
-                # Si la valeur est NaN, on met une chaîne vide
                 donnees[nom_champ] = "" if pd.isna(v) else v
+        print("DEBUG FOURN:", donnees)  # pour voir dans la console
         return render_template("templates_fournisseurs/factures_fournisseurs_ecriture.html", **donnees)
 
-
-    # Sinon, chercher dans SQL
+   # --------- SQL (grand livre) --------------
     conn = sqlite3.connect("grand_livre.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Sheet1 WHERE \"Numéro d'écriture\" = ?", (num_ecriture,))
-    ligne_sql = cursor.fetchone()
-    if ligne_sql:
+    cursor.execute('SELECT * FROM Sheet1 WHERE "Numéro d\'écriture" = ?', (num_ecriture,))
+    lignes_sql = cursor.fetchall()   # 🟩 Correction nom variable (avant: ligne_sql, maintenant: lignes_sql)
+    if lignes_sql:
         noms_colonnes = [desc[0] for desc in cursor.description]
-        ligne = dict(zip(noms_colonnes, ligne_sql))
-        donnees = {mapping_sql[k]: v for k, v in ligne.items() if k in mapping_sql}
-        return render_template("templates_comptabilite/grand_livre_ecriture.html", **donnees)
+        lignes = []
+        for row in lignes_sql:
+            ligne = dict(zip(noms_colonnes, row))
+            lignes.append({
+                "num_compte": ligne.get("N° compte", ""),
+                "intitule": ligne.get("Intitulé du compte", ""),
+                "periode": ligne.get("Période", ""),
+                "date_comptabilisation": ligne.get("Date", ""),
+                "libelle": ligne.get("Libellé", ""),
+                "fournisseur": ligne.get("Fournisseur", ""),
+                "debit": float(ligne.get("Débit", 0) or 0),
+                "credit": float(ligne.get("Crédit", 0) or 0)
+
+            })   # 🟩
+
+        # 🟩 On prépare le header pour préremplir le haut du formulaire (date, période, libellé)
+        header = lignes[0] if lignes else {}
+        print("DEBUG lignes:", lignes)    # 🟩 debug: toute la liste
+        print("DEBUG header:", header)    # 🟩 debug: première ligne
+
+        # 🟩 On envoie tout à Jinja (lignes et header)
+    return render_template(
+            "templates_comptabilite/grand_livre_ecriture.html",
+            lignes=lignes,
+            accounts=accounts,
+            date_comptabilisation=header.get("date_comptabilisation", ""),
+            periode=header.get("periode", ""),
+            libelle=header.get("libelle", "")
+        )
+        # 🟥 Le vieux bloc où tu faisais ligne = dict(zip(noms_colonnes, ligne_sql)) en dehors de la boucle → supprimé
 
     return "Numéro d'écriture introuvable", 404
+
 
 
 
