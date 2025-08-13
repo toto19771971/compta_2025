@@ -80,9 +80,13 @@
           <td>{{ entry.date }}</td>
           <td>{{ entry.libelle }}</td>
           <td class="num-ecriture">
-            <a href="{{ url_for('grand_livre_ecriture_id', num_ecriture=entry.num_ecriture) }}">
-              {{ entry.num_ecriture }}
-            </a>
+            {% if entry.num_ecriture %}
+              <a href="{{ url_for('editer_ecriture', num_ecriture=entry.num_ecriture) }}">
+                {{ entry.num_ecriture }}
+              </a>
+            {% else %}
+              (aucun)
+            {% endif %}
           </td>
           <td>{{ entry.fournisseur }}</td>
           <td>{{ entry.debit }}</td>

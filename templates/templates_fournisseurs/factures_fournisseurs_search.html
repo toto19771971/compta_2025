@@ -88,10 +88,24 @@
         <div class="fields">
           <div class="left-fields">
             <label>Code fournisseur :
-              <input type="text" name="code_fournisseur" id="code_fournisseur">
+              <input id="code_fournisseur" name="code_fournisseur" type="text" list="codes_fournisseurs" autocomplete="off">
+              <datalist id="codes_fournisseurs">
+                {% for f in df_fournisseurs %}
+                  <option value="{{ f['Code fournisseur'] }}"></option>
+                {% endfor %}
+              </datalist>
             </label>
+
+
+
+
             <label>Fournisseur :
-              <input type="text" name="nom_fournisseur" id="nom_fournisseur">
+              <input id="nom_fournisseur" name="nom_fournisseur" type="text" list="noms_fournisseurs" autocomplete="off">
+              <datalist id="noms_fournisseurs">
+                {% for f in df_fournisseurs %}
+                  <option value="{{ f['Nom du fournisseur'] }}"></option>
+                {% endfor %}
+              </datalist>
             </label>
             <label>N° de PO :
               <input type="text" name="po_number">
@@ -132,40 +146,72 @@
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         // 1) Define dropdown handlers
-        window.openListeFournisseurs    = ()=>alert('Liste fournisseurs');
-        window.openFactureFournisseur   = ()=>alert('Factures fournisseur');
-        window.openPaiement             = ()=>alert('Paiement');
+        window.openListeFournisseurs  = ()=>alert('Liste fournisseurs');
+        window.openFactureFournisseur = ()=>alert('Factures fournisseur');
+        window.openPaiement           = ()=>alert('Paiement');
 
         // 2) Attach top-button listeners
-        document.getElementById('btn-liste-fournisseurs')
-                .addEventListener('click', openListeFournisseurs);
-        document.getElementById('btn-facture-fournisseur')
-                .addEventListener('click', openFactureFournisseur);
-        document.getElementById('btn-paiement')
-                .addEventListener('click', openPaiement);
+        document.getElementById('btn-liste-fournisseurs').addEventListener('click', openListeFournisseurs);
+        document.getElementById('btn-facture-fournisseur').addEventListener('click', openFactureFournisseur);
+        document.getElementById('btn-paiement').addEventListener('click', openPaiement);
+      });
 
-        // 3) Autocomplete setup
-        function setupAutocomplete(id, url) {
-          const input = document.getElementById(id);
-          const dl    = document.createElement('datalist');
-          dl.id       = id + '-list';
-          document.body.appendChild(dl);
-          input.setAttribute('list', dl.id);
+      // 3) Autocomplete setup
+      document.addEventListener('DOMContentLoaded', function() {
+        const codeInput = document.getElementById('code_fournisseur');
+        const nomInput  = document.getElementById('nom_fournisseur');
 
-          let timer;
-          input.addEventListener('input', () => {
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-              fetch(url + '?q=' + encodeURIComponent(input.value))
-                .then(r => r.json())
-                .then(arr => { dl.innerHTML = arr.map(v => `<option value="${v}">`).join(''); });
-            }, 300);
-          });
+        let codeToNom = {}, nomToCode = {};
+
+        function loadOptions(url, listId) {
+          return fetch(url)
+            .then(r => r.json())
+            .then(data => {
+              const list = document.getElementById(listId);
+              list.innerHTML = '';
+              data.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v;
+                list.appendChild(opt);
+              });
+              return data; // important
+            });
         }
-        setupAutocomplete('code_fournisseur', '/api/autocomplete/code_api');
-        setupAutocomplete('nom_fournisseur',  '/api/autocomplete/nom_api');
+
+        // Chargement initial (liste complète) + construction mapping une fois les 2 listes reçues
+        Promise.all([
+          loadOptions(`/api/autocomplete/code_api?q=`, 'codes_fournisseurs'),
+          loadOptions(`/api/autocomplete/nom_api?q=`,  'noms_fournisseurs')
+        ]).then(([codes, noms]) => {
+          codeToNom = {};
+          nomToCode = {};
+          const L = Math.max(codes.length, noms.length);
+          for (let i = 0; i < L; i++) {
+            const c = codes[i] || '';
+            const n = noms[i]  || '';
+            if (c) codeToNom[c] = n;
+            if (n) nomToCode[n] = c;
+          }
+        });
+
+        // Filtrage dynamique (ne touche pas au mapping, il reste global)
+        codeInput.addEventListener('input', function() {
+          loadOptions(`/api/autocomplete/code_api?q=${encodeURIComponent(this.value)}`, 'codes_fournisseurs');
+        });
+        nomInput.addEventListener('input', function() {
+          loadOptions(`/api/autocomplete/nom_api?q=${encodeURIComponent(this.value)}`, 'noms_fournisseurs');
+        });
+
+        // Auto-remplissage après sélection (choix ferme)
+        codeInput.addEventListener('change', function() {
+          if (codeToNom[this.value]) nomInput.value = codeToNom[this.value];
+        });
+        nomInput.addEventListener('change', function() {
+          if (nomToCode[this.value]) codeInput.value = nomToCode[this.value];
+        });
       });
     </script>
+
 
 
   

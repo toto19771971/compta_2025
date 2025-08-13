@@ -74,18 +74,19 @@
 </head>
 <body class="suppliers-body">
 
-  <!-- Barre d’actions -->
+  <!-- Barre nav -->
   <div class="toolbar">
-    <button class="action-btn" onclick="location.href='/comptabilite_fournisseurs'">Retour</button>
-    <button class="action-btn" onclick="window.open('https://fr.wikipedia.org','_blank')">Aide</button>
-    <a class="toolbar" href="{{ url_for('factures_fournisseurs_search') }}">Rechercher</a>
-    <button class="action-btn" id="btn-create-facture" type="button">Créer</button>
-    <button class="action-btn" id="btn-update" type="button">MAJ</button>
-    <button class="action-btn" onclick="location.href='/liste_factures_fournisseurs'">Liste</button>
-    <button class="toolbar"onclick="location.href='/grand_livre_full'"> Publier le GL</button>
-    <button class="action-btn" id="btn-double-create" >Double création</button>
-    <button class="action-btn" id="btn-clear" type="button">Vider</button>
+    <button onclick="location.href='/comptabilite_fournisseurs'">Retour</button>
+    <button onclick="window.open('https://fr.wikipedia.org','_blank')">Aide</button>
+    <button type="button" onclick="location.href='/factures_fournisseurs_search'">Rechercher</button>
+    <button id="btn-create-facture" type="button">Créer</button>
+    <button id="btn-update" type="button">MAJ</button>
+    <button onclick="location.href='/liste_factures_fournisseurs'">Liste</button>
+    <button type="button" onclick="location.href='/grand_livre_full'">Publier le GL</button>
+    <button id="btn-double-create">Double création</button>
+    <button id="btn-clear" type="button">Vider</button>
   </div>
+
 
   <!-- Formulaire unique -->
   <form id="factureContainer" method="post" action="/creer_et_publier">
@@ -113,7 +114,7 @@
         <input id="date_facture" name="Date de facture" type="date" value="{{ date_facture|default('') }}">
 
         <label for="date_echeance">Date échéance :</label>
-        <input id="date_echeance" name="Date échéance" type="date" value="{{ date_echeance|default('') }}">
+        <input id="date_echeance" name="Date d'échéance" type="date" value="{{ date_echeance|default('') }}">
 
         <label for="date_paiement">Date paiement prévue :</label>
         <input id="date_paiement" name="Date paiement prévue" type="date" value="{{ date_paiement_prevue|default('') }}">
@@ -157,7 +158,7 @@
           <td><input name="libelle_compte[]" type="text" value="{{ libelle_compte|default('') }}"/></td>
           <td><input name="quantite[]" type="number" step="1" inputmode="numeric" value="{{ quantite|default('') }}"/></td>
           <td><input name="unite[]" type="number" step="1" inputmode="numeric" value="{{ unite|default('') }}"/></td>
-          <td><input name="base_ht[]" type="number" step="0.01" inputmode="decimal" value="{{ somme_brute|default('') }}"/></td>
+          <td><input name="base_ht[]" type="number" step="0.01" inputmode="decimal" value="{{ base_ht|default('') }}"/></td>
         </tr>
       </tbody>
     </table>

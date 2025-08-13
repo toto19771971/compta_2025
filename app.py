@@ -147,7 +147,7 @@ def bd_delai_paiement():
 # ────────────────────────────────────────────────────────────────────────────────
 @app.route('/comptabilite_fournisseurs')
 def comptabilite_fournisseurs():
-    return render_template('templates_fournisseurs/comptabilite_fournisseurs.html')
+    return render_template('comptabilite_fournisseurs.html')
 
 
 
@@ -486,7 +486,7 @@ def mettre_a_jour_facture():
 # ────────────────────────────────────────────────────────────────────────────────
 @app.route('/comptabilite_clients')
 def comptabilite_clients():
-    return render_template('templates_clients/comptabilite_clients.html')
+    return render_template('comptabilite_clients.html')
 
 @app.route('/recherche_clients')
 def recherche_clients():
@@ -601,6 +601,8 @@ def grand_livre_result():
     if ca:  df = df[df['N° compte'] <= ca]
     if pd_: df = df[df['Période'] >= pd_]
     if pa:  df = df[df['Période'] <= pa]
+
+    df['num_ecriture'] = df["Numéro d'écriture"].astype(str)
 
     resultats = {
         str(compte): grp.to_dict(orient='records')
@@ -834,6 +836,21 @@ def editer_ecriture(num_ecriture):
 
     import pandas as pd
 
+    if request.method == 'POST':
+        
+
+        print("▶ POST scalars")
+        for k in ["Nom du fournisseur","No compte Fournisseur","Condition de paiement","Date de facture","Date d'échéance","Date paiement prévue","Période","Montant","Balance","No de facture","No de commande","Statut","total_ttc"]:
+            print(k, "=", request.form.get(k))
+
+        print("▶ POST lists")
+        for name,label in [("compte[]","compte"),("libelle_compte[]","libelle_compte"),("quantite[]","quantite"),("unite[]","unite"),("base_ht[]","base_ht"),("compte_tva[]","compte_tva"),("libelle_tva[]","libelle_tva"),("taux_tva[]","taux_tva"),("montant_tva[]","montant_tva")]:
+            print(label, "=", request.form.getlist(name))
+
+
+
+
+
     df_accounts = pd.read_excel("plan_comptable.xlsx")
     accounts = [
         {"num_compte": str(row["N° compte"]), "intitule": row["Intitulé du compte"]}
@@ -859,7 +876,7 @@ def editer_ecriture(num_ecriture):
         "Libellé du compte": "libelle_compte",
         "Quantité": "quantite",
         "Unité": "unite",
-        "Somme brute": "somme_brute",
+        "Base HT": "base_ht",
         "No de compte TVA": "no_compte_tva",
         "Libellé TVA": "libelle_tva",
         "Taux TVA": "taux_tva",
@@ -1160,14 +1177,21 @@ def factures_fournisseurs_search():
 @app.route('/api/autocomplete/code_api', methods=['GET'])
 def autocomplete_code_api():
     q = request.args.get('q', '').lower()
-    matches = DF_FOURN[DF_FOURN['Code fournisseur'].str.lower().str.contains(q)]
-    return jsonify(matches['Code fournisseur'].unique().tolist())
+    if q == '':
+        matches = DF_FOURN['Code fournisseur']
+    else:
+        matches = DF_FOURN[DF_FOURN['Code fournisseur'].str.lower().str.contains(q)]['Code fournisseur']
+    return jsonify(matches.unique().tolist())
 
 @app.route('/api/autocomplete/nom_api', methods=['GET'])
 def autocomplete_nom_api():
     q = request.args.get('q', '').lower()
-    matches = DF_FOURN[DF_FOURN['Nom du fournisseur'].str.lower().str.contains(q)]
-    return jsonify(matches['Nom du fournisseur'].unique().tolist())
+    if q == '':
+        matches = DF_FOURN['Nom du fournisseur']
+    else:
+        matches = DF_FOURN[DF_FOURN['Nom du fournisseur'].str.lower().str.contains(q)]['Nom du fournisseur']
+    return jsonify(matches.unique().tolist())
+
 
 
 
@@ -1396,20 +1420,32 @@ def double_creation():
     df = pd.read_excel(FACTURES_PATH, dtype=str, keep_default_na=False)
     df.columns = [c.strip().replace("’","'") for c in df.columns]
     new_row = {
-        'Nom du fournisseur'    : form_data.get('Fournisseur',''),
-        'No compte Fournisseur' : form_data.get('No compte Fournisseur',''),
-        'Condition de paiement' : form_data.get('Condition de paiement',''),
-        'Date de facture'       : form_data.get('Date de facture',''),
-        'Date d\'échéance'      : form_data.get('Date échéance',''),
-        'Période'               : form_data.get('Période',''),
-        'Montant'               : form_data.get('Montant',''),
-        'No de facture'         : form_data.get('No de facture',''),
-        'No de compte'          : ';'.join(comptes_ht),
-        'Somme brute'           : ';'.join(base_ht_vals),
-        'No de compte TVA'      : ';'.join(comptes_tva),
-        'Montant TVA'           : ';'.join(tva_vals),
-        'Numéro d\'écriture'    : str(num_ecriture)
-    }
+    'Nom du fournisseur'    : form_data.get('Nom du fournisseur',''),
+    'No compte Fournisseur' : form_data.get('No compte Fournisseur',''),
+    'Condition de paiement' : form_data.get('Condition de paiement',''),
+    'Date de facture'       : form_data.get('Date de facture',''),
+    'Date d\'échéance'      : form_data.get('Date d\'échéance',''),
+    'Date paiement prévue'  : form_data.get('Date paiement prévue',''),
+    'Période'               : form_data.get('Période',''),
+    'Montant'               : form_data.get('Montant',''),
+    'Balance'               : form_data.get('Balance',''),
+    'No de facture'         : form_data.get('No de facture',''),
+    'No de commande'        : form_data.get('No de commande',''),
+    'Statut'                : form_data.get('Statut',''),
+    'No de compte'          : ';'.join(raw.get('compte[]', [])),
+    'Libellé du compte'     : ';'.join(raw.get('libelle_compte[]', [])),
+    'Quantité'              : ';'.join(raw.get('quantite[]', [])),
+    'Unité'                 : ';'.join(raw.get('unite[]', [])),
+    'Base HT'               : ';'.join(raw.get('base_ht[]', [])),
+    'No de compte TVA'      : ';'.join(raw.get('compte_tva[]', [])),
+    'Libellé TVA'           : ';'.join(raw.get('libelle_tva[]', [])),
+    'Taux TVA'              : ';'.join(raw.get('taux_tva[]', [])),
+    'Montant TVA'           : ';'.join(raw.get('montant_tva[]', [])),
+    'Total TTC'             : form_data.get('total_ttc',''),
+    'Paiement'              : form_data.get('Paiement',''),
+    'Numéro d\'écriture'    : str(num_ecriture)
+}
+
     df.loc[len(df)] = new_row
     df.to_excel(FACTURES_PATH, index=False)
 
