@@ -54,7 +54,7 @@ def get_connection():
 # ────────────────────────────────────────────────────────────────────────────────
 @app.route('/')
 def index():
-    return render_template('index2.html')
+    return render_template('index.html')
 
 @app.route('/en_construction')
 def en_construction():
